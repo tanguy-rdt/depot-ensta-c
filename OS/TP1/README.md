@@ -1,13 +1,14 @@
 # Ce qu'il faut retenir du TP1
 
 ## Table des matières
-1. [La primitive *fork()*](#la-primitive-fork---cf-exo1httpsgitroudautxyzenstadepot-ensta-c-blobsa3ostp1exo1exo1c)
-2. [Caractéristique générale d'un processus](#caractristique-gnrale-dun-processus---cf-exo2httpsgitroudautxyzenstadepot-ensta-c-blobsa3ostp1exo2exo2c--exo3httpsgitroudautxyzenstadepot-ensta-c-blobsa3ostp1exo3exo3c)
-3. [La primitive *exit()* et *wait()*](#la-primitive-exit-et-wait---cf-exo4httpsgitroudautxyzenstadepot-ensta-c-blobsa3ostp1exo4exo4c)
-4. [La primitive *waitpid()*](#la-primitive-waitpid---cf-exo5httpsgitroudautxyzenstadepot-ensta-c-blobsa3ostp1exo5exo5c)
-5. [Recouvrement d'un processus (*execl* et *execv*)](#recouvrement-dun-processus-execl-et-execv---cf-exo6httpsgitroudautxyzenstadepot-ensta-c-blobsa3ostp1exo6exo6c--exo7httpsgitroudautxyzenstadepot-ensta-c-blobsa3ostp1exo7exo7c)
+1. [La primitive *fork()*](#la-primitive-fork)
+2. [Caractéristique générale d'un processus](#caractristique-gnrale-dun-processus)
+3. [La primitive *exit()* et *wait()*](#la-primitive-exit-et-wait)
+4. [La primitive *waitpid()*](#la-primitive-waitpid)
+5. [Recouvrement d'un processus (*execl* et *execv*)](#recouvrement-dun-processus-execl-et-execv)
 
-## La primitive *fork()* - *cf.* [*exo1*](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo1/exo1.c)
+## La primitive *fork()* 
+*cf.* [*exo1*](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo1/exo1.c)
 
 La primitive *fork()* permet de créer un nouveau processus (processus fils) paralèllement a celui qui éxecute le code (processus père).
 
@@ -31,7 +32,9 @@ La primitive *fork()* permet de créer un nouveau processus (processus fils) par
     > [3734] -- I'm the father process <br>
       [3735] -- I'm the son process
 
-## Caractéristique générale d'un processus - *cf.* [*exo2*](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo2/exo2.c) *&* [*exo3*](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo3/exo3.c)
+## Caractéristique générale d'un processus
+*cf.* [*exo2*](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo2/exo2.c) *&* [*exo3*](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo3/exo3.c)
+
 - *PID* du processus actuel :
     ```c
     #include <unistd.h>
@@ -63,7 +66,8 @@ La primitive *fork()* permet de créer un nouveau processus (processus fils) par
     getcwd(processusPath, sizeof(processusPath));    
     ```
 
-## La primitive *exit()* et *wait()* - *cf.* [*exo4*](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo4/exo4.c)
+## La primitive *exit()* et *wait()* 
+*cf.* [*exo4*](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo4/exo4.c)
 
 - ***Exemple :***
     ```c
@@ -97,7 +101,8 @@ La primitive *fork()* permet de créer un nouveau processus (processus fils) par
       [3735] -- I'm the son process <br>
       exit code of the son process: 0
 
-## La primitive *waitpid()* - *cf.* [*exo5*](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo5/exo5.c)
+## La primitive *waitpid()*
+*cf.* [*exo5*](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo5/exo5.c)
 
 - ***Exemple :***
     ```c
@@ -138,7 +143,9 @@ La primitive *fork()* permet de créer un nouveau processus (processus fils) par
       PID of the zombie son process: 3735 <br>
       Return code of the child process: 0
 
-## Recouvrement d'un processus (*execl* et *execv*) - *cf.* [*exo6*](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo6/exo6.c) *&* [*exo7*](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo7/exo7.c)
+## Recouvrement d'un processus (*execl* et *execv*)
+*cf.* [*exo6*](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo6/exo6.c) *&* [*exo7*](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo7/exo7.c)
+
 - ***Exemple avec execl:***
     ```c
     #include <stdio.h>
