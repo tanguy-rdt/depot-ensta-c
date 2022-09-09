@@ -2,7 +2,7 @@
 
 ## Table des matières
 1. [La primitive *fork()*](#la-primitive-fork)
-2. [Caractéristique générale d'un processus](#caractristique-générale-dun-processus)
+2. [Caractéristique générale d'un processus](#caractéristique-générale-dun-processus)
 3. [La primitive *exit()* et *wait()*](#la-primitive-exit-et-wait)
 4. [La primitive *waitpid()*](#la-primitive-waitpid)
 5. [Recouvrement d'un processus (*execl* et *execv*)](#recouvrement-dun-processus-execl-et-execv)
