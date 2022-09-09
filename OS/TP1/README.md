@@ -1,4 +1,12 @@
 # Ce qu'il faut retenir du TP1
+
+## Table des matières
+1. [La primitive *fork()*](#la-primitive-fork---cf-exo1httpsgitroudautxyzenstadepot-ensta-c-blobsa3ostp1exo1exo1c)
+2. [Caractéristique générale d'un processus](#caractristique-gnrale-dun-processus---cf-exo2httpsgitroudautxyzenstadepot-ensta-c-blobsa3ostp1exo2exo2c--exo3httpsgitroudautxyzenstadepot-ensta-c-blobsa3ostp1exo3exo3c)
+3. [La primitive *exit()* et *wait()*](#la-primitive-exit-et-wait---cf-exo4httpsgitroudautxyzenstadepot-ensta-c-blobsa3ostp1exo4exo4c)
+4. [La primitive *waitpid()*](#la-primitive-waitpid---cf-exo5httpsgitroudautxyzenstadepot-ensta-c-blobsa3ostp1exo5exo5c)
+5. [Recouvrement d'un processus (*execl* et *execv*)](#recouvrement-dun-processus-execl-et-execv---cf-exo6httpsgitroudautxyzenstadepot-ensta-c-blobsa3ostp1exo6exo6c--exo7httpsgitroudautxyzenstadepot-ensta-c-blobsa3ostp1exo7exo7c)
+
 ## La primitive *fork()* - *cf.* [*exo1*](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo1/exo1.c)
 
 La primitive *fork()* permet de créer un nouveau processus (processus fils) paralèllement a celui qui éxecute le code (processus père).
