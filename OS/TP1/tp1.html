@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Tanguy ROUDAUT - FIPASE24" />
+  <title>TD1 - Création et terminaison des processus</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="styling.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">TD1 - Création et terminaison des processus</h1>
+<p class="author">Tanguy ROUDAUT - FIPASE24</p>
+<p class="date">10 septembre 2022</p>
+</header>
+<h1 id="ce-quil-faut-retenir-du-tp1">Ce qu’il faut retenir du TP1</h1>
+<h2 id="table-des-matières">Table des matières</h2>
+<ol type="1">
+<li><a href="#la-primitive-fork">La primitive <em>fork()</em></a></li>
+<li><a href="#caractéristique-générale-dun-processus">Caractéristique
+générale d’un processus</a></li>
+<li><a href="#la-primitive-exit-et-wait">La primitive <em>exit()</em> et
+<em>wait()</em></a></li>
+<li><a href="#la-primitive-waitpid">La primitive
+<em>waitpid()</em></a></li>
+<li><a href="#recouvrement-dun-processus-execl-et-execv">Recouvrement
+d’un processus (<em>execl</em> et <em>execv</em>)</a></li>
+</ol>
+<h2 id="la-primitive-fork">La primitive <code>fork()</code></h2>
+<p><em>cf.</em> <a
+href="https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo1/exo1.c"><em>exo1</em></a></p>
+<p>Si la primitive <code>fork()</code> est appelé par un
+processus(père), alors la commande va créer un second processus(fils)
+héritant d’une partie des caractéristique du processus père.</p>
+<ul>
+<li><p><em>fork()</em> a pour valeur de retour:</p>
+<ul>
+<li>-1 en cas d’échec</li>
+<li>0 pour le processus fils (est retourné quand c’est le fils qui est
+exécuté)</li>
+<li>Le PID du processus fils (est retourné quand c’est le père qui est
+exécuté)</li>
+</ul></li>
+<li><p><strong><em>Exemple :</em></strong></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">(){</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> pid <span class="op">=</span> fork<span class="op">();</span> </span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>pid <span class="op">==</span> <span class="op">-</span><span class="dv">1</span><span class="op">)</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;Unable to create the process</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>pid <span class="op">==</span> <span class="dv">0</span><span class="op">)</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;[%d] -- I&#39;m the son process</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> getpid<span class="op">());</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;[%d] -- I&#39;m the father process</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> getpid<span class="op">());</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<blockquote>
+<p>[3734] – I’m the father process <br> [3735] – I’m the son process</p>
+</blockquote></li>
+</ul>
+<h2 id="caractéristique-générale-dun-processus">Caractéristique générale
+d’un processus</h2>
+<p><em>cf.</em> <a
+href="https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo2/exo2.c"><em>exo2</em></a>
+<em>&amp;</em> <a
+href="https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo3/exo3.c"><em>exo3</em></a></p>
+<ul>
+<li><p><em>PID</em> du processus actuel et celui du père:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>pid <span class="op">=</span> getpid<span class="op">();</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>ppid <span class="op">=</span> getppid<span class="op">();</span></span></code></pre></div></li>
+<li><p>Propriétaire réel et effectif :</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>realOwner <span class="op">=</span> getuid<span class="op">();</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>beneficialOwner <span class="op">=</span> geteuid<span class="op">();</span></span></code></pre></div></li>
+<li><p>Le groupe propriétaire réel et effectif :</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>realOwnerGroup <span class="op">=</span> getgid<span class="op">();</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>beneficialOwnerGroup <span class="op">=</span> getegid<span class="op">();</span></span></code></pre></div></li>
+<li><p>Répertoire de travail :</p>
+<p>Si le tableau <code>processusPath</code> n’est pas suffisament grand,
+alors la commande va echouer</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode c"><code class="sourceCode c"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="dt">char</span> processusPath<span class="op">[</span><span class="dv">100</span><span class="op">];</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>getcwd<span class="op">(</span>processusPath<span class="op">,</span> <span class="kw">sizeof</span><span class="op">(</span>processusPath<span class="op">));</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>chdir<span class="op">(</span>processusPath<span class="op">);</span> <span class="co">// Useless in this case, fct for change dir </span></span></code></pre></div></li>
+</ul>
+<h2 id="la-primitive-exit-et-wait">La primitive <code>exit()</code> et
+<code>wait()</code></h2>
+<p><em>cf.</em> <a
+href="https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo4/exo4.c"><em>exo4</em></a></p>
+<ul>
+<li><p>La primitive <code>exit()</code> :</p>
+<p>Cette fonction met fin au processus qui l’a émis. Dans le cas ou ce
+processus était père, les processus fils deviennent des zombies (état
+<code>defunct</code>) quand ils se termine, puisque leurs père sont mort
+donc ils n’ont pas pu délivrer leurs dernier message.<br />
+En attendant que le processus fils soit terminé et qui puisse passer à
+l’état zombie, le processus va à l’orphelina et a pour père le processus
+<code>init</code> qui a pour PID 1, l’ancêtre de tous les processus du
+système excepté le processus 0.</p></li>
+<li><p>La primitive <code>wait()</code></p>
+<p>Cette fonction permet à un processus père d’attendre que les
+processus fils on finit leurs tâches. Grâce à cette fonction les
+processus fils ne deviennent pas des zombies, il garde le même père
+comme il est seulement en attente.<br />
+Il est possible de récupérer le status du code de retour des processus
+fils si on donne une variable partagé en paramètre de
+<code>wait()</code>.</p></li>
+<li><p><strong><em>Exemple :</em></strong></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdlib.h&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sys/wait.h&gt;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">(){</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> pid <span class="op">=</span> fork<span class="op">();</span> </span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> status <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>pid <span class="op">==</span> <span class="op">-</span><span class="dv">1</span><span class="op">){</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;Unable to create the process</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>pid <span class="op">==</span> <span class="dv">0</span><span class="op">){</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>        sleep<span class="op">(</span><span class="dv">5</span><span class="op">);</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;[%d] -- I&#39;m the son process</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> getpid<span class="op">());</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>        exit<span class="op">(</span><span class="dv">0</span><span class="op">);</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;[%d] -- I&#39;m the father process</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> getpid<span class="op">());</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>        wait<span class="op">(&amp;</span>status<span class="op">);</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;exit code of the son process: %d&quot;</span><span class="op">,</span> status<span class="op">);</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<blockquote>
+<p>[3734] – I’m the father process <br> [3735] – I’m the son process
+<br> exit code of the son process: 0</p>
+</blockquote></li>
+</ul>
+<h2 id="la-primitive-waitpid">La primitive <code>waitpid()</code></h2>
+<p><em>cf.</em> <a
+href="https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo5/exo5.c"><em>exo5</em></a></p>
+<p>La fonction <code>waitpid()</code> à le mėme principe de
+fonctionnement que la commande <code>wait</code> mais, au lieu
+d’attendre que tous les processus fils soient terminé. Le processus père
+attend uniquement le processus fils renseigné en paramètre de
+<code>waitpid(pid_t pid, int *status_ptr, int options)</code> grâce a
+son pid.</p>
+<ul>
+<li><p>La valeur de retour de <code>waitpid()</code> :</p>
+<ul>
+<li>-1 en cas d’erreur</li>
+<li>0 en cas d’échec</li>
+<li>&lt; 0 le PID du processus fils</li>
+</ul></li>
+<li><p>L’argument <code>int *status_ptr</code>:</p>
+<p>À l’aide d’une variable partagé donné en paramètre de
+<code>waitpid()</code> et de fonctions <em>(cf. tableau suivant)</em>,
+il est possible d’obtenir des informations sur la terminaison d’un
+processus</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Fonction</th>
+<th>Interprétation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>WIFEXITED</td>
+<td>Valeur non nulle si le processus s’est terminé normalement.</td>
+</tr>
+<tr class="even">
+<td>WEXITSTATUS</td>
+<td>Fournit le code de retour du processus si celui-ci s’est terminé
+normalement.</td>
+</tr>
+<tr class="odd">
+<td>WIFSIGNALED</td>
+<td>Valeur non nulle si le processus s’est terminé à cause d’un
+signale.</td>
+</tr>
+<tr class="even">
+<td>WTERMSIG</td>
+<td>Fournit le numéro du signal ayant provoqué la terminaison du
+processus.</td>
+</tr>
+<tr class="odd">
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody>
+</table></li>
+<li><p>L’argument <code>int options</code>:</p>
+<p>Il est possible de donner des options en paramètre :</p>
+<table>
+<thead>
+<tr class="header">
+<th>Option</th>
+<th>Interprétation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>Aucune option.</td>
+</tr>
+<tr class="even">
+<td>WNOHANG</td>
+<td>Le processus appelant n’est pas suspendu.</td>
+</tr>
+<tr class="odd">
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody>
+</table></li>
+<li><p><strong><em>Exemple :</em></strong></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdlib.h&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sys/wait.h&gt;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">(){</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> pid <span class="op">=</span> fork<span class="op">();</span> </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> terminaison <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> retWaitPid <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>pid <span class="op">==</span> <span class="op">-</span><span class="dv">1</span><span class="op">){</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;Unable to create the process</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>pid <span class="op">==</span> <span class="dv">0</span><span class="op">){</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>        sleep<span class="op">(</span><span class="dv">5</span><span class="op">);</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;[%d] -- I&#39;m the son process</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> getpid<span class="op">());</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>        exit<span class="op">(</span><span class="dv">0</span><span class="op">);</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;[%d] -- I&#39;m the father process</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> getpid<span class="op">());</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>        retWaitPid <span class="op">=</span> waitpid<span class="op">(</span>pidFils<span class="op">,</span> <span class="op">&amp;</span>terminaison<span class="op">,</span> <span class="dv">0</span><span class="op">);</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;PID of the zombie son process: %d</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> retWaitPid<span class="op">);</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>WIFEXITED<span class="op">(</span>terminaison<span class="op">))</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;Return code of the child process: %d</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> WEXITSTATUS<span class="op">(</span>terminaison<span class="op">));</span></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="cf">if</span> <span class="op">(</span>WIFSIGNALED<span class="op">(</span>terminaison<span class="op">))</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;ERROR: Number of the signal that caused the process to end: %d</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> WTERMSIG<span class="op">(</span>terminaison<span class="op">));</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<blockquote>
+<p>[3734] – I’m the father process <br> [3735] – I’m the son process
+<br> PID of the zombie son process: 3735 <br> Return code of the child
+process: 0</p>
+</blockquote></li>
+</ul>
+<h2 id="recouvrement-dun-processus-execl-et-execv">Recouvrement d’un
+processus (<code>execl()</code> et <code>execv()</code>)</h2>
+<p><em>cf.</em> <a
+href="https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo6/exo6.c"><em>exo6</em></a>
+<em>&amp;</em> <a
+href="https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo7/exo7.c"><em>exo7</em></a></p>
+<p>La seule solution pour créer un nouveau processus consiste à utiliser
+le principe de recouvrement. On va recouvrire un processus qui execute
+une tache A, pour qu’il puisse faire une tache B.<br />
+Ce nouveau processus n’en est pas réellement puisqu’il garde le PID du
+processus initial.</p>
+<p><code>execl()</code> prend en argument une liste de commande se
+terminant par <code>NULL</code> pour marquer la fin. Le premier argument
+doit être le chemin du programme à éxécuter, le second la command</p>
+<ul>
+<li><p>La primitive <code>execl()</code></p>
+<p>Doit prendre en argument une liste finis, respectant la trame
+suivante :</p>
+<ul>
+<li>arg0: Le chemin du programme à éxecuter. <em>(exemple:
+<code>/bin/ls</code>)</em></li>
+<li>arg1: Le nom de la commande à éxecuter. <em>(exemple:
+<code>ls</code>)</em></li>
+<li>arg2: Peut être une option, une chaîne de caractère. <em>(exemple:
+<code>-l</code>)</em></li>
+<li>arg3: …</li>
+<li>argn: <code>NULL</code> pour marquer la fin.</li>
+</ul>
+<p>Sa valeur de retour est -1 dans le cas d’échec, sinon les commandes
+suivants <code>execl()</code> ne sont pas réaliser comme le processus
+initial a une nouvelle tâche.</p></li>
+<li><p><strong><em>Exemple avec <code>execl()</code>:</em></strong></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdlib.h&gt;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main <span class="op">()</span> <span class="op">{</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span> buf <span class="op">[</span><span class="dv">80</span><span class="op">];</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    printf <span class="op">(</span><span class="st">&quot;[%d]-- Start of the exec() test</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span>getpid<span class="op">());</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    sprintf <span class="op">(</span>buf<span class="op">,</span><span class="st">&quot;-- pid=[%d]&quot;</span><span class="op">,</span> getpid<span class="op">());</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    execl <span class="op">(</span><span class="st">&quot;/bin/echo&quot;</span><span class="op">,</span><span class="st">&quot;echo&quot;</span><span class="op">,</span><span class="st">&quot;Execution&quot;</span><span class="op">,</span><span class="st">&quot;of an exec test&quot;</span><span class="op">,</span>buf<span class="op">,</span> NULL<span class="op">);</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    printf <span class="op">(</span><span class="st">&quot;[%d]-- Failure of the execl() function</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span>getpid<span class="op">());</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    printf <span class="op">(</span><span class="st">&quot;[%d]-- End of exec() test</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span>getpid<span class="op">());</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    exit<span class="op">(</span><span class="dv">0</span><span class="op">);</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<blockquote>
+<p>[4683]– Start of the exec() test <br> Execution of an exec test –
+pid=[4683]</p>
+</blockquote></li>
+<li><p>La primitive <code>execv()</code></p>
+<p>Doit prendre en argument un vecteur de pointeurs, respectant la trame
+suivante :</p>
+<ul>
+<li>argv[0]: Le chemin du programme à éxecuter. <em>(exemple:
+<code>/bin/ls</code>)</em></li>
+<li>argv[1]: Le nom de la commande à éxecuter. <em>(exemple:
+<code>ls</code>)</em></li>
+<li>argv[2]: Peut être une option, une chaîne de caractère.
+<em>(exemple: <code>-l</code>)</em></li>
+<li>argv[3]: …</li>
+<li>argv[4]: <code>NULL</code> pour marquer la fin.</li>
+</ul>
+<p>Sa valeur de retour est -1 dans le cas d’échec, sinon les commandes
+suivants <code>execl()</code> ne sont pas réaliser comme le processus
+initial a une nouvelle tâche.</p></li>
+<li><p><strong><em>Exemple avec <code>execv()</code>:</em></strong></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdlib.h&gt;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main <span class="op">()</span> <span class="op">{</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span> buf <span class="op">[</span><span class="dv">80</span><span class="op">];</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span> <span class="op">*</span>argv <span class="op">[</span><span class="dv">5</span><span class="op">];</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    argv <span class="op">[</span><span class="dv">0</span><span class="op">]</span> <span class="op">=</span> <span class="st">&quot;echo&quot;</span><span class="op">;</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    argv <span class="op">[</span><span class="dv">1</span><span class="op">]</span> <span class="op">=</span> <span class="st">&quot;Execution&quot;</span><span class="op">;</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    argv <span class="op">[</span><span class="dv">2</span><span class="op">]</span> <span class="op">=</span> <span class="st">&quot;of an exec test&quot;</span><span class="op">;</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    argv <span class="op">[</span><span class="dv">3</span><span class="op">]</span> <span class="op">=</span> buf<span class="op">;</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    argv <span class="op">[</span><span class="dv">4</span><span class="op">]</span> <span class="op">=</span> NULL<span class="op">;</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    printf <span class="op">(</span><span class="st">&quot;[%d]-- Start of the exec() test</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span>getpid<span class="op">());</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    sprintf <span class="op">(</span>buf<span class="op">,</span><span class="st">&quot;-- pid=[%d]&quot;</span><span class="op">,</span> getpid<span class="op">());</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    execv <span class="op">(</span><span class="st">&quot;/bin/echo&quot;</span><span class="op">,</span> argv<span class="op">);</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    printf <span class="op">(</span><span class="st">&quot;[%d]-- Failure of the execv() function</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span>getpid<span class="op">());</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    printf <span class="op">(</span><span class="st">&quot;[%d]-- End of exec() test</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span>getpid<span class="op">());</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    exit<span class="op">(</span><span class="dv">0</span><span class="op">);</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<blockquote>
+<p>[4712]– Start of the exec() test <br> Execution of an exec test –
+pid=[4712]</p>
+</blockquote></li>
+</ul>
+</body>
+</html>
