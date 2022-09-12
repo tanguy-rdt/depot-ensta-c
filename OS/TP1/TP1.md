@@ -1,6 +1,5 @@
 ---
 title: "TD1 - Création et terminaison des processus"
-author: Tanguy ROUDAUT - FIPASE24
 date: 10 septembre 2022
 ---
 
@@ -50,7 +49,7 @@ Si la primitive ```fork()``` est appelée par un processus (père), alors la com
 ## Caractéristique générale d'un processus
 *cf.* [*exo2*](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo2/exo2.c) *&* [*exo3*](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo3/exo3.c)
 
-- *PID* du processus actuel et celui du père :
+- ***PID* du processus actuel et celui du père :**
 
     ```c
     #include <unistd.h>
@@ -59,7 +58,7 @@ Si la primitive ```fork()``` est appelée par un processus (père), alors la com
     ppid = getppid();
     ```
 
-- Propriétaire réel et effectif :
+- **Propriétaire réel et effectif :**
 
   Le propriétaire réel correspond à l’utilisateur qui a lancé le processus. \
   Le propriétaire effectif correspond normalement au propriétaire réel, mais celui-ci peut être modifié si nécessaire. Par exemple,
@@ -73,7 +72,7 @@ Si la primitive ```fork()``` est appelée par un processus (père), alors la com
   beneficialOwner = geteuid();
   ```
 
-- Le groupe propriétaire réel et effectif :
+- **Le groupe propriétaire réel et effectif :**
 
     ```c
     #include <unistd.h>
@@ -82,7 +81,7 @@ Si la primitive ```fork()``` est appelée par un processus (père), alors la com
     beneficialOwnerGroup = getegid();
     ```
 
-- Répertoire de travail :
+- **Répertoire de travail :**
 
     Si le tableau ```processusPath``` n’est pas suffisamment grand, alors la commande va échouer
 
@@ -97,7 +96,7 @@ Si la primitive ```fork()``` est appelée par un processus (père), alors la com
 ## La primitive ```exit()``` et ```wait()```
 *cf.* [*exo4*](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP1/exo4/exo4.c)
 
-- La primitive ```exit()``` :
+- **La primitive ```exit()``` :**
 
     Cette fonction met fin au processus qui l’a émis. Dans le cas ou ce processus était père, les processus fils deviennent des zombies (état ```defunct```) quand ils se termine, 
     puisque leurs pères sont morts donc ils n’ont pas pu délivrer leurs derniers messages. \
@@ -105,7 +104,7 @@ Si la primitive ```fork()``` est appelée par un processus (père), alors la com
     et a pour père le processus ```init``` qui a pour PID 1, l’ancêtre de tous les processus du système excepté le processus 0.
 
 
-- La primitive ```wait()```
+- **La primitive ```wait()``` :**
     
     Cette fonction permet à un processus père d’attendre que les processus fils on finit leurs tâches. Grâce à cette fonction les processus fils ne deviennent pas des zombies, il garde le même père comme il est
     seulement en attente. \
@@ -229,7 +228,7 @@ La seule solution pour créer un nouveau processus consiste à utiliser le princ
 Ce nouveau processus n’en est pas réellement puisqu’il garde le PID du processus initial. 
 
 
-- La primitive ```execl()``` 
+- **La primitive ```execl()``` :**
   
   Dois prendre en argument une liste finie, respectant la trame suivante :
 
@@ -267,7 +266,7 @@ Ce nouveau processus n’en est pas réellement puisqu’il garde le PID du proc
 
 
 
-- La primitive ```execv()```
+- **La primitive ```execv()``` :**
 
   Dois prendre en argument un vecteur de pointeurs, respectant la trame suivante :
 
