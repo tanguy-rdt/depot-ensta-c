@@ -46,7 +46,7 @@ int main(int argc,char ** argv)
     printf("cle %d (dec) %x (hex) inode %x\n", k,k,(int)buf.st_ino);
 
     // Q: appel � la fonction semget() et mise de la valeur de retour dans la variable semid
-    semid = semget(k, (int)*argv[2], IPC_CREAT & IPC_EXCL);
+    semid = semget(k, (int)*argv[2], IPC_CREAT | 0600);
 
     if (semid==-1)
     {
@@ -63,12 +63,12 @@ int main(int argc,char ** argv)
     }
 
     // le tableau values contient l'ensemble des valeur avec lesquels on veut initialiser les s�maphores
-    for (s=0; s<nbSem; s++) values[s]=val;
+    for (s=0; s<nbSem; s++) values[s]=0;
 
 
     // Q: faites un appel � la fonction semclt() pour initialiser les s�maphore avec les valeurs se trouvant dans le tableau values
     // utilisez l'op�ration SETALL
-    semctl(semid, (int)*argv[2], SETALL, argv[3]);
+    semctl(semid, (int)*argv[2], SETALL, values);
     free(values);
 
 
