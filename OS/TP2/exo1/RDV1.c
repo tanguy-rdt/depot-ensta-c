@@ -26,11 +26,8 @@ int P(int semid, int noSem)
     Ops[0].sem_op = -1;
     Ops[0].sem_flg = 0;
 
-    // Q- faire appel � la fonction semop pour r�aliser l'op�ration P, la variable OK r�cup�re la valeur de retour
     ok = semop(semid, Ops, 1);
-
-    if((ok = semop(semid, Ops, 1))) return ok;
-    else return -1;
+    return ok;
 }
 
 /* retourne -1 en cas d'erreur           */
@@ -45,11 +42,8 @@ int V(int semid, int noSem)
     Ops[0].sem_op = +1;
     Ops[0].sem_flg = 0;
 
-    // Q- faire appel � la fonction semop pour r�aliser l'op�ration V, la variable OK r�cup�re la valeur de retour
     ok = semop(semid, Ops, 1);
-
-    if((ok = semop(semid, Ops, 1))) return ok;
-    else return -1;
+    return ok;
 }
 
 int main (void)
@@ -69,8 +63,8 @@ int main (void)
     sleep(1);
 
     // Q- faire appel � P et � V (voir le TD)
-    V(semid, 1);
-    P(semid, 0);
+    V(semid, 0);
+    P(semid, 1);
 
     // appeler la fonction de RDV, un printf est suffisant.
     printf("RDV1");
