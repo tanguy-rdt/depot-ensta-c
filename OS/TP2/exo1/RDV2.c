@@ -51,7 +51,7 @@ int main (void)
 
     // Q- Il faut d'abord recr�er la cl� (voir sema.c)
     key_t k;
-    k = ftok("toto", PRJVAL);
+    k = ftok("myKey", PRJVAL);
 
     // Q- il faut ensuite ouvrir le semaphore avec semget, � part la cl�, les autres argument doivent �tre � z�ro
     // car il ne s'agit pas d'une cr�ation mais d'une ouverture
