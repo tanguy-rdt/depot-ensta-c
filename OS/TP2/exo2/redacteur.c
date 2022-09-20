@@ -12,20 +12,25 @@
 #include <time.h>
 
 #define PRJVAL  1
-//#define MUTEX_R 0
-//#define MUTEX_L 1
+#define MUTEX_R 0 // macro pour le processus redacteur
+#define MUTEX_L 1 // macro pour le processus lecteur
 
 time_t myTime;
 
+/** fonction pour l'écriture dans un fichier **/
 int ecrire(const char *filename){
-    time(&myTime);
+    int state;
+    time(&myTime); // en plus pour écrire l'heur dans le fichier
 
     FILE *fp;
-    fp = fopen(filename, "w");
-    fprintf(fp, "%s %s", "Hello World -", ctime(&myTime));
-    fclose(fp);
+    fp = fopen(filename, "w"); // ouverture/création du fichier, le contenu est effacé si le fichier existe
+    state = fprintf(fp, "%s %s", "Hello World -", ctime(&myTime)); // écriture dans le fichier
+    fclose(fp); // fermeture du fichier
 
-    return 0;
+    if (state < 0){
+        printf("ERROR: Nothing was written\n");
+    }
+    return state;
 }
 
 int P(int semid, int noSem)
@@ -33,12 +38,16 @@ int P(int semid, int noSem)
     struct sembuf Ops[1];
     int ok;
 
-    Ops[0].sem_num = noSem;
-    Ops[0].sem_op = -1;
+    Ops[0].sem_num = noSem; // numéro du sem à affecter l'opération
+    Ops[0].sem_op = -1; // Opération -- comme P()
     Ops[0].sem_flg = 0;
 
-    ok = semop(semid, Ops, 1);
-    return ok;
+    // arg1: l'id de l'ensemble des sémaphores, arg2: opération à effectuer, arg3: nombre d'opération à effectuer
+    if((ok = semop(semid, Ops, 1)) == -1){// Réalisation de l'opération
+        printf("Err %d P()", ok);
+        exit(-1); // err retour -1
+    }
+    return ok; // return 0
 }
 
 int V(int semid, int noSem)
@@ -46,32 +55,35 @@ int V(int semid, int noSem)
     struct sembuf Ops[1];
     int ok;
 
-    Ops[0].sem_num = noSem;
-    Ops[0].sem_op = +1;
+    Ops[0].sem_num = noSem; // numéro du sem à affecter l'opération
+    Ops[0].sem_op = +1; // Opération ++ comme V()
     Ops[0].sem_flg = 0;
 
-    ok = semop(semid, Ops, 1);
-    return ok;
+    // arg1: l'id de l'ensemble des sémaphores, arg2: opération à effectuer, arg3: nombre d'opération à effectuer
+    if((ok = semop(semid, Ops, 1)) == -1){// Réalisation de l'opération
+        printf("Err %d V()", ok);
+        exit(-1); // err retour -1
+    }
+    return ok; // return 0
 }
 
 int main (void)
 {
     const char *filename = "myFile.txt";
-    int MUTEX_R = 0;
-    int MUTEX_L = 1;
+    int stateMutexR;
 
     key_t k;
-    k = ftok("myKey", PRJVAL);
+    k = ftok("myKey", PRJVAL); // On récupère la même clé que celle utilisée pour la création des sem
 
-    int semid = semget(k, 0, 0);
+    int semid = semget(k, 0, 0); // On ouvre l'esemble des sem avec la clé et on recup l'id
     printf("cle %d (dec) %x (hex)\n", k, k);
     printf("semid obtenu:%d\n", semid);
 
-    P(semid, MUTEX_R);
-    sleep(10);
-    ecrire(filename);
-    V(semid, MUTEX_R);
+    P(semid, MUTEX_R); // On prend le rédacteur pour bloquer les lecteurs
+    sleep(10); // sleep bidon
+    ecrire(filename); // on écris dans le fichier
+    V(semid, MUTEX_R); // On libére le R pour permettre au L de lire le fichier
 
-    //semctl(semid, 2, IPC_RMID);
+    //semctl(semid, 2, IPC_RMID); // suppression des sem
     return 0;
 }
