@@ -136,7 +136,7 @@ class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sys/types.h&gt;</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sys/ipc.h&gt;</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> semid <span class="op">=</span> semget<span class="op">(</span>k<span class="op">,</span> nbSem<span class="op">,</span> IPC_CREAT <span class="op">|</span> <span class="bn">0600</span><span class="op">);</span> <span class="co">// sans le | 0600 ca ne marche pas jsp pq</span></span></code></pre></div></li>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> semid <span class="op">=</span> semget<span class="op">(</span>k<span class="op">,</span> nbSem<span class="op">,</span> IPC_CREAT <span class="op">|</span> <span class="bn">0600</span><span class="op">);</span> <span class="co">// 0600 pour autoriser lecture et écriture</span></span></code></pre></div></li>
 <li><p><strong>Initialisation des sémaphores avec
 <code>semctl()</code></strong></p>
 <p><code>semctl(int semid, int semnum, int cmd, ...)</code> utilise l’id
@@ -224,5 +224,128 @@ href="https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP2/exo1"><em>ex
 <h2 id="problème-du-lecteurrédacteur">Problème du lecteur/rédacteur</h2>
 <p><em>cf.</em> <a
 href="https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TP2/exo2"><em>exo2</em></a></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">/** premier processus (redacteur) **/</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">/** fonction pour l&#39;écriture dans un fichier **/</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> ecrire<span class="op">(</span><span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>filename<span class="op">){</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> state<span class="op">;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    time<span class="op">(&amp;</span>myTime<span class="op">);</span> <span class="co">// en plus pour écrire l&#39;heur dans le fichier</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="dt">FILE</span> <span class="op">*</span>fp<span class="op">;</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    fp <span class="op">=</span> fopen<span class="op">(</span>filename<span class="op">,</span> <span class="st">&quot;w&quot;</span><span class="op">);</span> <span class="co">// ouverture/création du fichier, le contenu est effacé si le fichier existe</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    state <span class="op">=</span> fprintf<span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;%s %s&quot;</span><span class="op">,</span> <span class="st">&quot;Hello World -&quot;</span><span class="op">,</span> ctime<span class="op">(&amp;</span>myTime<span class="op">));</span> <span class="co">// écriture dans le fichier</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    fclose<span class="op">(</span>fp<span class="op">);</span> <span class="co">// fermeture du fichier</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>state <span class="op">&lt;</span> <span class="dv">0</span><span class="op">){</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;ERROR: Nothing was written</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> state<span class="op">;</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main <span class="op">(</span><span class="dt">void</span><span class="op">)</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="op">{</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>filename <span class="op">=</span> <span class="st">&quot;myFile.txt&quot;</span><span class="op">;</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> stateMutexR<span class="op">;</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    key_t k<span class="op">;</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    k <span class="op">=</span> ftok<span class="op">(</span><span class="st">&quot;myKey&quot;</span><span class="op">,</span> PRJVAL<span class="op">);</span> <span class="co">// On récupère la même clé que celle utilisée pour la création des sem</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> semid <span class="op">=</span> semget<span class="op">(</span>k<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">);</span> <span class="co">// On ouvre l&#39;esemble des sem avec la clé et on recup l&#39;id</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;cle %d (dec) %x (hex)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> k<span class="op">,</span> k<span class="op">);</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;semid obtenu:%d</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> semid<span class="op">);</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>    P<span class="op">(</span>semid<span class="op">,</span> MUTEX_R<span class="op">);</span> <span class="co">// On prend le rédacteur pour bloquer les lecteurs</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    sleep<span class="op">(</span><span class="dv">10</span><span class="op">);</span> <span class="co">// sleep bidon</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>    ecrire<span class="op">(</span>filename<span class="op">);</span> <span class="co">// on écris dans le fichier</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>    V<span class="op">(</span>semid<span class="op">,</span> MUTEX_R<span class="op">);</span> <span class="co">// On libére le R pour permettre au L de lire le fichier</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>    <span class="co">//semctl(semid, 2, IPC_RMID); // suppression des sem</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">/** second processus (lecteur) **/</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">/** fonction pour mettre a jour le nb de lecteur **/</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> update_nb_lecteur<span class="op">(</span><span class="dt">int</span> val<span class="op">){</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> state<span class="op">;</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">FILE</span> <span class="op">*</span>fp<span class="op">;</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    fp <span class="op">=</span> fopen<span class="op">(</span><span class="st">&quot;nombre&quot;</span><span class="op">,</span> <span class="st">&quot;w&quot;</span><span class="op">);</span> <span class="co">// ouverture/création du fichier, le contenu est effacé si le fichier existe</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    state <span class="op">=</span> fprintf<span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;%d&quot;</span><span class="op">,</span> val<span class="op">);</span> <span class="co">// écriture du nombre de lecteur actif dans le fichier</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    fclose<span class="op">(</span>fp<span class="op">);</span> <span class="co">// fermeture du fichier</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>state <span class="op">&lt;</span> <span class="dv">0</span><span class="op">){</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;ERROR: Nothing was written</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> state<span class="op">;</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="co">/** fonction pour obtenir le nb de lecteur actif **/</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> get_nb_lecteur<span class="op">(){</span></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> nb<span class="op">;</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> state<span class="op">;</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>    <span class="dt">FILE</span> <span class="op">*</span>fp<span class="op">;</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>    fp <span class="op">=</span> fopen<span class="op">(</span><span class="st">&quot;nombre&quot;</span><span class="op">,</span> <span class="st">&quot;r&quot;</span><span class="op">);</span> <span class="co">// ouverture du fichier pour lire le conteu, le fichier doit existé</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>    state <span class="op">=</span> fscanf<span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;%d&quot;</span><span class="op">,</span> <span class="op">&amp;</span>nb<span class="op">);</span> <span class="co">// on récupére le nombre de lecteur et on le stock dans la var nb</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    fclose<span class="op">(</span>fp<span class="op">);</span> <span class="co">// fermeture du fichier</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>state <span class="op">==</span> <span class="dv">0</span><span class="op">){</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;ERROR: Nothing to read</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> nb<span class="op">;</span> <span class="co">// on retourne le nombre de fichier</span></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="co">/** fonction pour lire le fichier **/</span></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> lire<span class="op">(</span><span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>filename<span class="op">){</span></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>    <span class="dt">char</span> str1<span class="op">[</span><span class="dv">6</span><span class="op">],</span> str2<span class="op">[</span><span class="dv">6</span><span class="op">],</span> str3<span class="op">[</span><span class="dv">2</span><span class="op">],</span> str4<span class="op">[</span><span class="dv">4</span><span class="op">],</span> str5<span class="op">[</span><span class="dv">4</span><span class="op">],</span> str6<span class="op">[</span><span class="dv">9</span><span class="op">];</span> <span class="co">// var pour stocker le contenu</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> date<span class="op">,</span> year<span class="op">;</span> <span class="co">// var pour stocker le contenu</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> state<span class="op">;</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>    <span class="dt">FILE</span> <span class="op">*</span>fp<span class="op">;</span></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>    fp <span class="op">=</span> fopen<span class="op">(</span>filename<span class="op">,</span> <span class="st">&quot;r&quot;</span><span class="op">);</span> <span class="co">// ouverture du fichier pour lire le conteu, le fichier doit existé</span></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>    state <span class="op">=</span> fscanf<span class="op">(</span>fp<span class="op">,</span> <span class="st">&quot;%s %s %s %s %s %d %s %d&quot;</span><span class="op">,</span> str1<span class="op">,</span> str2<span class="op">,</span> str3<span class="op">,</span> str4<span class="op">,</span> str5<span class="op">,</span> <span class="op">&amp;</span>date<span class="op">,</span> str6<span class="op">,</span> <span class="op">&amp;</span>year<span class="op">);</span> <span class="co">// on lit le contenu</span></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;%s %s %s %s %s %d %s %d&quot;</span><span class="op">,</span> str1<span class="op">,</span> str2<span class="op">,</span> str3<span class="op">,</span> str4<span class="op">,</span> str5<span class="op">,</span> date<span class="op">,</span> str6<span class="op">,</span> year<span class="op">);</span> <span class="co">// on affiche le contenu</span></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>    fclose<span class="op">(</span>fp<span class="op">);</span> <span class="co">// on ferme le fichier</span></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>state <span class="op">==</span> <span class="dv">0</span><span class="op">){</span></span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;ERROR: Nothing to read</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> state<span class="op">;</span></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main <span class="op">(</span><span class="dt">void</span><span class="op">)</span></span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>    <span class="op">{</span></span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>    <span class="dt">const</span> <span class="dt">char</span> <span class="op">*</span>filename <span class="op">=</span> <span class="st">&quot;myFile.txt&quot;</span><span class="op">;</span></span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> nb_lecteur<span class="op">;</span></span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>    key_t k<span class="op">;</span></span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>    k <span class="op">=</span> ftok<span class="op">(</span><span class="st">&quot;myKey&quot;</span><span class="op">,</span> PRJVAL<span class="op">);</span> <span class="co">// On récupère la même clé que celle utilisée pour la création des sem</span></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> semid <span class="op">=</span> semget<span class="op">(</span>k<span class="op">,</span> <span class="dv">0</span><span class="op">,</span> <span class="dv">0</span><span class="op">);</span> <span class="co">// On ouvre l&#39;esemble des sem avec la clé et on recup l&#39;id</span></span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;cle %d (dec) %x (hex)</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> k<span class="op">,</span> k<span class="op">);</span></span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>    printf<span class="op">(</span><span class="st">&quot;semid obtenu:%d</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> semid<span class="op">);</span></span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>    P<span class="op">(</span>semid<span class="op">,</span> MUTEX_L<span class="op">);</span> <span class="co">// On prend le lecteur pour bloquer la modification du nombre de lecteur</span></span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a>    nb_lecteur <span class="op">=</span> get_nb_lecteur<span class="op">();</span> <span class="co">// on récupère le nb de lecteur</span></span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>    update_nb_lecteur<span class="op">(</span>nb_lecteur<span class="op">+</span><span class="dv">1</span><span class="op">);</span> <span class="co">// on incrémente le nombre de lecteur</span></span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span><span class="op">(</span>get_nb_lecteur<span class="op">()</span> <span class="op">==</span> <span class="dv">1</span><span class="op">){</span></span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>        printf<span class="op">(</span><span class="st">&quot;%d&quot;</span><span class="op">,</span> P<span class="op">(</span>semid<span class="op">,</span> MUTEX_R<span class="op">));</span> <span class="co">// si c&#39;est le premier lecteur alors on prend le redacteur pour eviter une modif</span></span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>    V<span class="op">(</span>semid<span class="op">,</span> MUTEX_L<span class="op">);</span> <span class="co">// on libére le lecteur</span></span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>    sleep<span class="op">(</span><span class="dv">5</span><span class="op">);</span> <span class="co">// sleep bidon</span></span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a>    lire<span class="op">(</span>filename<span class="op">);</span> <span class="co">// on lit le fichier</span></span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>    P<span class="op">(</span>semid<span class="op">,</span> MUTEX_L<span class="op">);</span> <span class="co">// On prend le lecteur pour bloquer la modification du nombre de lecteur</span></span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>    nb_lecteur <span class="op">=</span> get_nb_lecteur<span class="op">();</span> <span class="co">// on récupère le nb de lecteur</span></span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>    update_nb_lecteur<span class="op">(</span>nb_lecteur<span class="op">-</span><span class="dv">1</span><span class="op">);</span> <span class="co">// on décrémente le nombre de lecteur</span></span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span><span class="op">(</span>get_nb_lecteur<span class="op">()</span> <span class="op">==</span> <span class="dv">0</span><span class="op">){</span></span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>        V<span class="op">(</span>semid<span class="op">,</span> MUTEX_R<span class="op">);</span> <span class="co">// si c&#39;est le dernier lecteur on libére le redacteur pour une modif potentiel</span></span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a>    V<span class="op">(</span>semid<span class="op">,</span> MUTEX_L<span class="op">);</span>  <span class="co">// on libére le lecteur</span></span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a>    <span class="co">//semctl(semid, 2, IPC_RMID); // supp des sem</span></span>
+<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
 </body>
 </html>
