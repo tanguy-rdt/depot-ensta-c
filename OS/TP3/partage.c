@@ -46,3 +46,7 @@ int supprimerZonePartagee(Zone * zp)
     { perror("shmctl (supprimerZonePartagee)"); return -1; }
     return 0;
 }
+
+void writeZonePartagee(Zone * zp, int nbChar){
+    zp->taille = nbChar;
+}
