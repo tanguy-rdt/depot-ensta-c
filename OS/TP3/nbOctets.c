@@ -11,12 +11,13 @@
 
 void comHandler(int sig)
 {
-    /* Display a message indicating we have received a signal */
-    if (sig == SIGUSR1) printf("Received a SIGUSR1 signal\n");
+    if (sig == SIGUSR1) printf("[%d] -- Reception du signal SIGUSR1\n", getpid());
 }
 
 int main(int argc, const char * argv[])
 {
+
+    printf("[%d] -- PID du pere\n", getpid());
 
     pid_t pidWC;
     pid_t pidREAD;
@@ -24,8 +25,7 @@ int main(int argc, const char * argv[])
     int statusWaitPidWC, statusPidWC;
     int statusWaitPidREAD, statusPidREAD;
 
-    FILE *fIn; /* Pour faire un fdopen : int -> FILE * */
-    int *ptDeb; /* Un pointeur (int*) sur la zone debut */
+    FILE *fIn;
     char *fileName=NULL;
 
     struct sigaction action;
@@ -36,73 +36,62 @@ int main(int argc, const char * argv[])
         return 1;
     }
     fileName=argv[1];
-    /* A cause de warnings lorsque le code n’est pas encore la ...*/
-    (void)fIn; (void)pidREAD;
-    (void)pidWC;
 
     /* Gestion des signaux */
     /* =================== */
-    /* Preparation de la structure action pour recevoir le signal SIGUSR1*/
     action.sa_handler = &comHandler;
-    /* Appel a l’appel systeme sigaction */
     if (sigaction(SIGUSR1, &action, NULL) == -1) {
         perror("sigaction");
         exit(EXIT_FAILURE);
     }
     else {
-        printf("Communication handler set\n");
+        printf("[%d] -- Communication handler set\n", getpid());
     }
 
     /* Creation de la zone de memoire partagee */
     /* ======================================= */
     Zone z;
     if (creerZonePartagee(sizeof(int),&z)==-1) exit(-1);
-    ptDeb=(int*)z.debut;
-
+    int *ptDeb=(int*)z.debut;
 
     /* Creation du tube */
     /* ================ */
-    printf("creation tube\n");
+    printf("[%d] -- Creation du tube\n", getpid());
     int tube[2];
     pipe(tube);
 
-    printf("creation pidWC\n");
-    printf("pid du pere %d\n", getpid());
-
     /* Creation du processus qui fera le exec ... */
     /* ============================================ */
+    printf("[%d] -- Creation du fils pidWC\n", getpid());
     pidWC=fork();
     if(pidWC == 0){
-        printf("pid du pidWC %d\n", getpid());
-        printf("enter pidWC\n");
-        close(tube[0]); // fermeture en lecture
-        close(1); // pas d'écriture sur l'écran (stdout)
-        dup(tube[1]); // df[1] devient sortie standart
-        close(tube[1]); // description inutile après redirection
-        execl("/usr/bin/wc", "wc", "-c", fileName, NULL); // recouvrement par la commande 'wc -c' //TODO
-        printf("exit pidREAD\n");
+        printf("[%d] -- PID du fils pidWC\n", getpid());
+        close(tube[0]);
+        close(1);
+        dup(tube[1]);
+        close(tube[1]);
+        execl("/usr/bin/wc", "wc", "-c", fileName, NULL);
         exit(0);
     }
-    printf("creation pidREAD\n");
 
+    /* Creation du processus qui fera la lecture ...*/
+    /* ============================================ */
+    printf("[%d] -- Creation du fils pidREAD\n", getpid());
     pidREAD=fork();
     if (pidREAD == 0){
-        printf("pid du pidREAD %d\n", getpid());
-        printf("enter pidREAD\n");
+        printf("[%d] -- PID du pidREAD\n", getpid());
         close(tube[1]); // fermeture en écriture
         close(0);
         fIn=fdopen(tube[0],"r");
         int nbChar;
         fscanf(fIn, "%d", &nbChar);
-        writeZonePartagee(&z, 10);
-        printf("Lu dans la mp: %d\n", z.taille);
-        printf("z.id: %d\n", z.id);
+        ptDeb = &nbChar;
+        printf("[%d] -- Le fils pidREAD lis dans la mp: %d\n", getpid(), *ptDeb);
         fclose(fIn);
+        printf("[%d] -- Sleep 5sec\n", getpid());
         sleep(5);
-        printf("send sig\n");
-        raise(SIGUSR1);
-        printf("Lu dans la mp: %d\n", z.taille);
-        printf("z.id: %d\n", z.id);
+        printf("[%d] -- Envoie sig SIGUSR1\n", getpid());
+        sigqueue(getppid(), SIGUSR1, NULL);
         exit(0);
     }
 
@@ -110,28 +99,14 @@ int main(int argc, const char * argv[])
 
     /* La suite du pere */
     /* ================ */
-    /* Fermer les descripteurs de tube inutiles au pere */
+    /* Fermer les descripteurs de tube inutiles au pere */ //TODO
     /* ... */
-    /* Attente d’un signal */
-    printf("pid du att %d\n", getpid());
-
-    printf("attente sig\n");
+    printf("[%d] -- Attente du sig SIGUSR1\n", getpid());
     pause();
-    /* Recuperer le resultat dans la memoire partagee */
-    int nbCharRead = z.taille;
-    printf("Lu dans la mp: %d\n", nbCharRead);
-    printf("z.id: %d\n", z.id);
-
-    /* Attendre le 1er enfant */
+    printf("[%d] -- Le pere lis dans la mp: %d\n", getpid(), *ptDeb);
     statusWaitPidWC = waitpid(pidWC, &statusPidWC, 0);
-    /* Attendre le 2eme enfant */
     statusWaitPidREAD = waitpid(pidREAD, &statusPidWC, 0);
-    /* Supprimer la memoire partagee */
     supprimerZonePartagee(&z);
-
-
-    /* Display a message indicating we are leaving main */
-    printf("Finished main\n");
 
     return 0;
 }

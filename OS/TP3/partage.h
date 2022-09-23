@@ -16,7 +16,6 @@ typedef struct
 /* fonctions publiques */
 extern int creerZonePartagee(int taille, Zone * zp);
 extern int supprimerZonePartagee(Zone * zp);
-extern void writeZonePartagee(Zone * zp, int nbChar);
 
 #endif //DEPOT_ENSTA_C_PARTAGE_H
 
