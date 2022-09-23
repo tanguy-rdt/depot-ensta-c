@@ -1,5 +1,3 @@
-/* Example using raise by TechOnTheNet.com */
-
 #include <stdio.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -83,15 +81,13 @@ int main(int argc, const char * argv[])
         close(tube[1]); // fermeture en écriture
         close(0);
         fIn=fdopen(tube[0],"r");
-        int nbChar;
-        fscanf(fIn, "%d", &nbChar);
-        ptDeb = &nbChar;
+        fscanf(fIn, "%d", ptDeb);
         printf("[%d] -- Le fils pidREAD lis dans la mp: %d\n", getpid(), *ptDeb);
         fclose(fIn);
-        printf("[%d] -- Sleep 5sec\n", getpid());
+        printf("[%d] -- Sleep 5sec avant d'envoyer le signal\n", getpid());
         sleep(5);
         printf("[%d] -- Envoie sig SIGUSR1\n", getpid());
-        sigqueue(getppid(), SIGUSR1, NULL);
+        kill(getppid(), SIGUSR1);
         exit(0);
     }
 
@@ -104,6 +100,7 @@ int main(int argc, const char * argv[])
     printf("[%d] -- Attente du sig SIGUSR1\n", getpid());
     pause();
     printf("[%d] -- Le pere lis dans la mp: %d\n", getpid(), *ptDeb);
+
     statusWaitPidWC = waitpid(pidWC, &statusPidWC, 0);
     statusWaitPidREAD = waitpid(pidREAD, &statusPidWC, 0);
     supprimerZonePartagee(&z);

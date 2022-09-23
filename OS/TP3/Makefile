@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -lrt 
+CFLAGS=-Wall
 LDFLAGS=
 EXEC=nbOctets
 
