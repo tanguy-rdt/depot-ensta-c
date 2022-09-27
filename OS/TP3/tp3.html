@@ -96,7 +96,7 @@
 <ul>
 <li><a href="#la-mémoire-partagé">La mémoire partagé</a>
 <ul>
-<li><a href="#les-fonctions-de-la-mémoire-partagé">Les fonctions de la
+<li><a href="#les-primitives-de-la-mémoire-partagé">Les primitives de la
 mémoire partagé</a></li>
 <li><a href="#utilisation-de-la-mémoire-partagé">Utilisation de la
 mémoire partagé</a></li>
@@ -115,13 +115,130 @@ signaux</a></li>
 <li><a href="#le-code-du-tp">Le code du TP</a></li>
 </ul>
 <h1 id="la-mémoire-partagé">La mémoire partagé</h1>
-<h2 id="les-fonctions-de-la-mémoire-partagé">Les fonctions de la mémoire
-partagé</h2>
+<h2 id="les-primitives-de-la-mémoire-partagé">Les primitives de la
+mémoire partagé</h2>
 <ol type="1">
-<li><strong>La fonction <code>shmget()</code></strong> :</li>
-<li><strong>La fonction <code>shmat()</code></strong> :</li>
-<li><strong>La fonction <code>shmctl()</code></strong> :</li>
-<li><strong>La fonction <code>shmdt()</code></strong> :</li>
+<li><p><strong>La primitive <code>shmget()</code></strong> :</p>
+<p>Permet la création d’un nouveau segment de mémoire partagé ou la
+recherche d’un segment. Le principe est le même qu’avec
+<code>semget()</code>, mais cette fois-ci pour un segment et pas un
+semaphore.</p>
+<p>Le prototype
+<code>int shmget(key_t key, size_t size, int shmflg)</code>, prend comme
+argument :</p>
+<ul>
+<li><p>arg1: Une clé, qui peut avoir la valeur spéciale
+<code>IPC_PRIVATE</code> de type <code>key_t</code> ou une clé obtenus
+avec <code>ftok()</code></p></li>
+<li><p>arg2: La taille du segment.</p></li>
+<li><p>arg3: Des options pour modifier la création que l’on souhaite
+<em>(voir le tableau suivant).</em></p>
+<table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Valeur de option</th>
+<th>Explication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Droits</td>
+<td>Un nouveau segment de mémoire privé est systématiquement créé.</td>
+</tr>
+<tr class="even">
+<td><code>IPC_CREAT &amp;#124; IPC_EXCL &amp;#124; droits</code></td>
+<td>Création d’un nouveau segment de mémoire associé à la clé passée en
+paramètre. Si le segment existe déjà, une erreur est détectée.</td>
+</tr>
+<tr class="odd">
+<td><code>IPC_CREAT &amp;#124; droits</code></td>
+<td>Récupération de l’identification d’un segment de mémoire existant
+dont la clé est passée en paramètre. Si le segmentn’existe pas, il est
+créé.</td>
+</tr>
+</tbody>
+</table>
+<p><em>Avec droits la valeurs de nos droits, exmeple: 0600. Voir <a
+href="https://chmodcommand.com/">ici</a> pour plus d’info.</em></p></li>
+</ul>
+<p>La fonction <code>shmget()</code> retourne l’id du segment
+partagé.</p></li>
+<li><p><strong>La primitive <code>shmat()</code></strong> :</p>
+<p>Permet d’attacher notre segment partagé (créé avec
+<code>shmget()</code>) à l’espace d’adressage du processus appelant.</p>
+<p>Le prototype
+<code>void* shmat(int shmid, const void *shmaddr, int shmflg)</code>,
+prend comme argument :</p>
+<ul>
+<li>arg1: ID du segment partagé obtenus dans la valeur de retour de
+<code>shmget()</code>.</li>
+<li>arg2: L’adresse où attacher le segment. Si <code>NULL</code> c’est
+le processus appelant qui choisis l’addresse, sinon <em>rtfm</em>
+:)</li>
+<li>arg3: Si l’option <code>SHM_RDONLY</code> est donnée alors le
+processus peux uniquement accéder au segment en lecture.</li>
+</ul>
+<p>La fonction <code>shmat()</code> retourne avec succès l’addr où est
+attaché le segment partagé, sinon <code>(void*)-1</code>.</p></li>
+<li><p><strong>La primitive <code>shmctl()</code></strong> :</p>
+<p>La primitive <code>shmctl()</code> permet d’accéder aux informations
+contenues dans l’entrée de la table des segments de mémoire partagée et
+d’en modifier certains attributs.</p>
+<p>Le prototype
+<code>int shmctl(int shmid, int cmd, struct shmid_ds *buf);</code>,
+prend comme argument :</p>
+<ul>
+<li><p>arg1: ID du segment partagé obtenus dans la valeur de retour de
+<code>shmget()</code>.</p></li>
+<li><p>arg2: L’opération qu’on souhaite réaliser <em>(voir le tableau
+suivant).</em></p></li>
+<li><p>arg3: Structure permettant la modification des informations du
+segment, applicable avec la commande <code>IPC_SET</code>.</p>
+<table>
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 76%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Valeur de <code>cmd</code></th>
+<th>Explication</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>IPC_RMID</code></td>
+<td>Suppression du segment de mémoire.</td>
+</tr>
+<tr class="even">
+<td><code>IPC_STAT</code></td>
+<td>Récupération des informations dans <code>shmid_ds</code>.</td>
+</tr>
+<tr class="odd">
+<td><code>IPC_SET</code></td>
+<td>Modification des informations du segment avec
+<code>shmid_ds</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>La fonction <code>shmctl()</code> retourne avec succès 0, sinon
+-1.</p></li>
+</ul></li>
+<li><p><strong>La primitive <code>shmdt()</code></strong> :</p>
+<p>C’est la fonction contraire de <code>shmat()</code>, cette primitive
+permet de détacher notre segment partagé attaché à une certaine adresse
+donnée en arg2 de <code>shmat()</code>.</p>
+<p>Le prototype <code>int shmdt(const void *shmaddr)</code>, prend comme
+argument :</p>
+<ul>
+<li>arg1: L’adresse où est attaché notre segment.</li>
+</ul>
+<p>La fonction <code>shmdt()</code> retourne avec succès l’addr où était
+attaché le segment partagé, sinon <code>(void*)-1</code>.</p></li>
 </ol>
 <h2 id="utilisation-de-la-mémoire-partagé">Utilisation de la mémoire
 partagé</h2>
@@ -133,29 +250,239 @@ class="sourceCode c"><code class="sourceCode c"><span id="cb1-1"><a href="#cb1-1
 <h1 id="les-tubes">Les tubes</h1>
 <h2 id="les-fonctions-des-tubes">Les fonctions des tubes</h2>
 <ol type="1">
-<li><strong>La fonction <code>pipe()</code></strong> :</li>
+<li><p><strong>La fonction <code>pipe()</code></strong> :</p>
+<p>Permet de créer un tube.</p>
+<p>Le prototype <code>int pipe(int fdinfo[2])</code>, prend en argument
+un tableau de deux entiers. On peut utiliser les deux descripteurs
+fournis à la suite de l’appel de la fonction :</p>
+<ul>
+<li><code>df[0]</code> pour la sortie du tube, soit la lecture</li>
+<li><code>df[1]</code> pour l’entrée du tube, soit l’écriture</li>
+</ul>
+<p><em>La syntaxe précédente est valable si c’est un tableau de deux
+entiers portants le nom <code>df</code> qui est donnée en argument de
+<code>pipe</code>, si c’est <code>tube</code> l’argument alors les
+descripteurs seront <code>tube[0]</code> et
+<code>tube[1]</code></em></p>
+<p>La fonction <code>pipe()</code> retourne avec succès 0, sinon
+-1.</p></li>
 </ol>
 <h2 id="utilisation-des-tubes">Utilisation des tubes</h2>
 <ul>
 <li><p>Exemple :</p>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">//</span><span class="al">TODO</span></span></code></pre></div></li>
+class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdlib.h&gt;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sys/types.h&gt;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sys/wait.h&gt;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">(){</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> tube<span class="op">[</span><span class="dv">2</span><span class="op">];</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  pipe<span class="op">(</span>tube<span class="op">);</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  pid1<span class="op">=</span>fork<span class="op">();</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span><span class="op">(</span>pid1 <span class="op">==</span> <span class="dv">0</span><span class="op">){</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>      close<span class="op">(</span>tube<span class="op">[</span><span class="dv">0</span><span class="op">]);</span> <span class="co">// fermeture en lecture (sortie du tube)</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>      close<span class="op">(</span><span class="dv">1</span><span class="op">);</span> <span class="co">// pas d&#39;écriture sur l&#39;écran</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>      dup<span class="op">(</span>tube<span class="op">[</span><span class="dv">1</span><span class="op">]);</span> <span class="co">// la sortie standard devient l&#39;entrée du tube</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>      close<span class="op">(</span>tube<span class="op">[</span><span class="dv">1</span><span class="op">]);</span> <span class="co">// descripteur inutile après redirection</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>      execl<span class="op">(</span><span class="st">&quot;/usr/bin/ls&quot;</span><span class="op">,</span> <span class="st">&quot;ls&quot;</span><span class="op">,</span> <span class="st">&quot;-l&quot;</span><span class="op">,</span> NULL<span class="op">);</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>      exit<span class="op">(</span><span class="dv">0</span><span class="op">);</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> <span class="cf">if</span><span class="op">(</span>pid1 <span class="op">==</span> <span class="op">-</span><span class="dv">1</span><span class="op">){</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>      printf<span class="op">(</span><span class="st">&quot;pid1, ERROR: -1&quot;</span><span class="op">);</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>      exit<span class="op">(-</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  pid2<span class="op">=</span>fork<span class="op">();</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>pid2 <span class="op">==</span> <span class="dv">0</span><span class="op">){</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>      close<span class="op">(</span>tube<span class="op">[</span><span class="dv">1</span><span class="op">]);</span> <span class="co">// fermeture en écriture (entrée du tube)</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>      close<span class="op">(</span><span class="dv">0</span><span class="op">);</span> <span class="co">// pas de lecture sur le clavier</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>      dup<span class="op">(</span>tube<span class="op">[</span><span class="dv">0</span><span class="op">]);</span> <span class="co">// l&#39;entrée standard devient la sortie du tube</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>      close<span class="op">(</span>tube<span class="op">[</span><span class="dv">0</span><span class="op">]);</span> <span class="co">// descripteur inutile après redirection</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>      execl<span class="op">(</span><span class="st">&quot;/usr/bin/grep&quot;</span><span class="op">,</span> <span class="st">&quot;grep&quot;</span><span class="op">,</span> <span class="st">&quot;toto&quot;</span><span class="op">,</span> NULL<span class="op">);</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> <span class="cf">if</span><span class="op">(</span>pid2 <span class="op">==</span> <span class="op">-</span><span class="dv">1</span><span class="op">){</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>      printf<span class="op">(</span><span class="st">&quot;READ, ERROR: -1&quot;</span><span class="op">);</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>      exit<span class="op">(-</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div></li>
 </ul>
 <h1 id="les-signaux">Les signaux</h1>
 <h2 id="les-fonctions-des-signaux">Les fonctions des signaux</h2>
 <ol type="1">
-<li><strong>La fonction <code>signal()</code></strong> :</li>
-<li><strong>La fonction <code>sigaction()</code></strong> :</li>
-<li><strong>La structure <code>struct sigaction</code> avec la fonction
-<code>sigaction()</code></strong> :</li>
-<li><strong>La fonction <code>kill()</code></strong> :</li>
-<li><strong>La fonction <code>pause()</code></strong> :</li>
+<li><p><strong>La fonction <code>signal()</code></strong> :</p>
+<p>La fonction <code>signal()</code> permet de modifier le comportement
+d’un signal, par exemple si on souhaite qu’à la réception du signal, il
+faut faire une pirouette au lieu d’une galipette.</p>
+<p>Le prototype
+<code>void ( *signal (int sig, void(*func)(int)) )(int)</code>, prend
+comme argument :</p>
+<ul>
+<li>arg1: Le type de signal dont il faut modifier le comportement.</li>
+<li>arg2: Le handler, qui est une fonction où l’on met dedans ce que
+l’on souhaite que le programme fasse à la réception du signal.</li>
+</ul></li>
+<li><p><strong>La fonction <code>sigaction()</code> et la structure
+<code>struct sigaction</code></strong> :</p>
+<p>La fonction <code>sigaction()</code> remplie le même objectif que la
+fonction <code>signal()</code>, mais c’est une fonction <em>POSIX
+(Portable Operating System Interface)</em>.</p>
+<p>La structure <code>struct sigaction</code>, est un des arguments de
+la fonction <code>sigaction()</code>, elle va permettre de modifier le
+comportement de notre signal. Par exemple pour le handler si on a créé
+l’implémentation <code>struct sigaction action</code> on peut faire
+<code>action.sa_handler = &amp;sigHandler</code> pour dire qu’à la
+réception du signal le programme doit faire la fonction
+<code>sigHandler()</code>.</p>
+<p>Le prototype
+<code>int sigaction(int sig, const struct sigaction *__restrict__ new, struct sigaction *__restrict__ old);</code>,
+prend comme argument :</p>
+<ul>
+<li>arg1: Le type de signal dont il faut modifier le comportement.</li>
+<li>arg2: L’implémentation de la structure
+<code>struct sigaction</code>, qu’on aura créé préalablement avec les
+modifications souhaitées</li>
+<li>arg3: on va mettre <code>null</code> pour simplifier les
+choses.</li>
+</ul></li>
+<li><p><strong>La fonction <code>kill()</code></strong> :</p>
+<p>Permet d’envoyer un signal.</p>
+<p>Le prototype <code>int kill(int pid, int sig)</code>, prend en
+argument un tableau de deux entiers. On peut utiliser les deux
+descripteurs fournis à la suite de l’appel de la fonction :</p>
+<ul>
+<li><p>arg1: Le PID du processus qui doit recevoir le signal.</p></li>
+<li><p>arg2: Le signal à émettre <em>(voir le tableau suivant).</em></p>
+<table>
+<colgroup>
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 85%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Signal</th>
+<th>N°</th>
+<th>Commentaires</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>SIGHUP</code></td>
+<td>1</td>
+<td>Signal émis lors d’une déconnexion</td>
+</tr>
+<tr class="even">
+<td><code>SIGINT</code></td>
+<td>2</td>
+<td>Il est émis à tout processus associé à un terminal de contrôle quand
+on appuie sur la touche d’interruption ‘Ctrl-C’.</td>
+</tr>
+<tr class="odd">
+<td><code>SIGQUIT</code></td>
+<td>3</td>
+<td>Semblable à SIGINT mais le signal est émis quand on appuie sur la
+touche d’abandon (normalement ’Ctl-’).</td>
+</tr>
+<tr class="even">
+<td><code>SIGILL</code></td>
+<td>4</td>
+<td>Instruction illégale.</td>
+</tr>
+<tr class="odd">
+<td><code>SIGFPE</code></td>
+<td>8</td>
+<td>Erreur de calcul flottant.</td>
+</tr>
+<tr class="even">
+<td><code>SIGKILL</code></td>
+<td>9</td>
+<td>C’est la seule manière absolument sûre de détruire un processus,
+puisque ce signal est toujours fatal.</td>
+</tr>
+<tr class="odd">
+<td><code>SIGALRM</code></td>
+<td>14</td>
+<td>Signal émis par alarm(int sec) au bout de sec secondes.</td>
+</tr>
+<tr class="even">
+<td><code>SIGTERM</code></td>
+<td>15</td>
+<td>Terminaison logicielle. Il s’agit du signal standard de
+terminaison.</td>
+</tr>
+<tr class="odd">
+<td><code>SIGUSR1</code></td>
+<td>16</td>
+<td>Premier signal à la disposition de l’utilisateur.</td>
+</tr>
+<tr class="even">
+<td><code>SIGUSR2</code></td>
+<td>17</td>
+<td>Deuxième signal à la disposition de l’utilisateur.</td>
+</tr>
+<tr class="odd">
+<td><code>SIGCHLD</code></td>
+<td>18</td>
+<td>Ce signal est envoyé au père à la terminaison d’un processus
+fils.</td>
+</tr>
+</tbody>
+</table></li>
+</ul></li>
+<li><p><strong>La fonction <code>pause()</code></strong> :</p>
+<p>Permet de mettre le processus en pause et d’attendre un signal avant
+de continuer.</p></li>
 </ol>
 <h2 id="utilisation-des-signaux">Utilisation des signaux</h2>
 <ul>
 <li><p>Exemple :</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">//</span><span class="al">TODO</span></span></code></pre></div></li>
+<div class="sourceCode" id="cb3"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;signal.h&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdlib.h&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;unistd.h&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sys/types.h&gt;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sys/wait.h&gt;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> signalHandler<span class="op">(</span><span class="dt">int</span> sig<span class="op">);</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>sig <span class="op">==</span> SIGUSER1<span class="op">)</span>printf<span class="op">(</span><span class="st">&quot;I do pirouette because I received the signal %d</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">,</span> sig<span class="op">);</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> main<span class="op">(){</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="kw">struct</span> sigaction action<span class="op">;</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  action<span class="op">.</span>sa_handler <span class="op">=</span> <span class="op">&amp;</span>comHandler<span class="op">;</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>sigaction<span class="op">(</span>SIGUSR1<span class="op">,</span> <span class="op">&amp;</span>action<span class="op">,</span> NULL<span class="op">)</span> <span class="op">==</span> <span class="op">-</span><span class="dv">1</span><span class="op">){</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>      perror<span class="op">(</span><span class="st">&quot;sigaction&quot;</span><span class="op">);</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>      exit<span class="op">(</span>EXIT_FAILURE<span class="op">);</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>      printf<span class="op">(</span><span class="st">&quot;Communication handler set</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">);</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  fils <span class="op">=</span> fork<span class="op">();</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(</span>fils <span class="op">==</span> <span class="dv">0</span><span class="op">){</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>      printf<span class="op">(</span><span class="st">&quot;The son wait before send the signal</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">)</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>      sleep<span class="op">(</span><span class="dv">5</span><span class="op">);</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>      printf<span class="op">(</span><span class="st">&quot;The son send the signal</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">)</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>      kill<span class="op">(</span>getppid<span class="op">(),</span> SIGUSR1<span class="op">);</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>      exit<span class="op">(</span><span class="dv">0</span><span class="op">);</span> </span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  sleep<span class="op">(</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>  printf<span class="op">(</span><span class="st">&quot;The father wait the signal</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">)</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>  pause<span class="op">();</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>  printf<span class="op">(</span><span class="st">&quot;end...</span><span class="sc">\n</span><span class="st">&quot;</span><span class="op">)</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<blockquote>
+<p>Communication handler set<br />
+The son wait before send the signal<br />
+The father wait the signal<br />
+The son send the signal<br />
+I do pirouette because I received the signal 16<br />
+end…</p>
+</blockquote></li>
 </ul>
 <h1 id="le-code-du-tp">Le code du TP</h1>
 <div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">/** nbOctets.c **/</span></span></code></pre></div>
