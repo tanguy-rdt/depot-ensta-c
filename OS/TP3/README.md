@@ -5,6 +5,7 @@ date: 21 septembre 2022
 
 # Table des matières
 
+- [Table des matières](#table-des-matières)
 - [La mémoire partagé](#la-mémoire-partagé)
   - [Les primitives de la mémoire partagé](#les-primitives-de-la-mémoire-partagé)
   - [Utilisation de la mémoire partagé](#utilisation-de-la-mémoire-partagé)
@@ -12,8 +13,8 @@ date: 21 septembre 2022
   - [Les fonctions des tubes](#les-fonctions-des-tubes)
   - [Utilisation des tubes](#utilisation-des-tubes)
 - [Les signaux](#les-signaux)
-    - [Les fonctions des signaux](#les-fonctions-des-signaux)
-    - [Utilisation des signaux](#utilisation-des-signaux)
+  - [Les fonctions des signaux](#les-fonctions-des-signaux)
+  - [Utilisation des signaux](#utilisation-des-signaux)
 - [Le code du TP](#le-code-du-tp)
 
 
@@ -21,8 +22,7 @@ date: 21 septembre 2022
 ## Les primitives de la mémoire partagé
    1. **La primitive ```shmget()```** :
 
-        Permet la création d'un nouveau segment de mémoire partagé ou la recherche d'un segment. Le principe est le même qu'avec ```semget()```, mais cette fois-ci pour un segment et pas un semaphore. 
-        
+        Permet la création d'un nouveau segment de mémoire partagé ou la recherche d'un segment. Le principe est le même qu'avec ```semget()```, mais cette fois-ci pour un segment et pas un semaphore. \
         Le prototype ```int shmget(key_t key, size_t size, int shmflg)```, prend comme argument :
         - arg1: Une clé, qui peut avoir la valeur spéciale ```IPC_PRIVATE``` de type ```key_t``` ou une clé obtenus avec ```ftok()```
         - arg2: La taille du segment.
@@ -31,8 +31,8 @@ date: 21 septembre 2022
           Valeur de option | Explication 
           --- |----------
           Droits | Un nouveau segment de mémoire privé est systématiquement créé. 
-          ```IPC_CREAT &#124; IPC_EXCL &#124; droits``` | Création d’un nouveau segment de mémoire associé à la clé passée en paramètre. Si le segment existe déjà, une erreur est détectée.
-          ```IPC_CREAT &#124; droits``` | Récupération de l’identification d’un segment de mémoire existant dont la clé est passée en paramètre. Si le segmentn’existe pas, il est créé.
+          ```IPC_CREAT \| IPC_EXCL \| droits``` | Création d’un nouveau segment de mémoire associé à la clé passée en paramètre. Si le segment existe déjà, une erreur est détectée.
+          ```IPC_CREAT \| droits``` | Récupération de l’identification d’un segment de mémoire existant dont la clé est passée en paramètre. Si le segmentn’existe pas, il est créé.
           *Avec droits la valeurs de nos droits, exmeple: 0600. Voir [ici](https://chmodcommand.com/) pour plus d'info.* 
       
         La fonction ```shmget()``` retourne l'id du segment partagé.
@@ -40,8 +40,7 @@ date: 21 septembre 2022
 
    2. **La primitive ```shmat()```** :
     
-        Permet d'attacher notre segment partagé (créé avec ```shmget()```) à l'espace d'adressage du processus appelant.
-
+        Permet d'attacher notre segment partagé (créé avec ```shmget()```) à l'espace d'adressage du processus appelant. \
         Le prototype ```void* shmat(int shmid, const void *shmaddr, int shmflg)```, prend comme argument :
         - arg1: ID du segment partagé obtenus dans la valeur de retour de ```shmget()```.
         - arg2: L'adresse où attacher le segment. Si ```NULL``` c'est le processus appelant qui choisis l'addresse, sinon *rtfm* :)
@@ -53,8 +52,7 @@ date: 21 septembre 2022
 
    3. **La primitive ```shmctl()```** :
 
-       La primitive ```shmctl()``` permet d’accéder aux informations contenues dans l’entrée de la table des segments de mémoire partagée et d’en modifier certains attributs.
-
+       La primitive ```shmctl()``` permet d’accéder aux informations contenues dans l’entrée de la table des segments de mémoire partagée et d’en modifier certains attributs. \
        Le prototype ```int shmctl(int shmid, int cmd, struct shmid_ds *buf);```, prend comme argument :
        - arg1: ID du segment partagé obtenus dans la valeur de retour de ```shmget()```.
        - arg2: L'opération qu'on souhaite réaliser *(voir le tableau suivant).*
@@ -72,8 +70,7 @@ date: 21 septembre 2022
       
    5. **La primitive ```shmdt()```** :
 
-      C'est la fonction contraire de ```shmat()```, cette primitive permet de détacher notre segment partagé attaché à une certaine adresse donnée en arg2 de ```shmat()```.
-
+      C'est la fonction contraire de ```shmat()```, cette primitive permet de détacher notre segment partagé attaché à une certaine adresse donnée en arg2 de ```shmat()```. \
       Le prototype ```int shmdt(const void *shmaddr)```, prend comme argument :
        - arg1: L'adresse où est attaché notre segment.
 
@@ -91,14 +88,12 @@ date: 21 septembre 2022
 ## Les fonctions des tubes
    1. **La fonction ```pipe()```** :
       
-      Permet de créer un tube. 
-
+      Permet de créer un tube. \
       Le prototype ```int pipe(int fdinfo[2])```, prend en argument un tableau de deux entiers. On peut utiliser les deux descripteurs fournis à la suite de l'appel de la fonction :
         - ```df[0]``` pour la sortie du tube, soit la lecture
         - ```df[1]``` pour l'entrée du tube, soit l'écriture
       
-      *La syntaxe précédente est valable si c'est un tableau de deux entiers portants le nom ```df``` qui est donnée en argument de ```pipe```, si c'est ```tube``` l'argument alors les descripteurs seront 
-      ```tube[0]``` et ```tube[1]```*
+      *La syntaxe précédente est valable si c'est un tableau de deux entiers portants le nom ```df``` qui est donnée en argument de ```pipe```, si c'est ```tube``` l'argument alors les descripteurs seront ```tube[0]``` et ```tube[1]```*
 
       La fonction ```pipe()``` retourne avec succès 0, sinon -1.
 
@@ -149,8 +144,7 @@ date: 21 septembre 2022
 ## Les fonctions des signaux
    1. **La fonction ```signal()```** :
       
-      La fonction ```signal()``` permet de modifier le comportement d'un signal, par exemple si on souhaite qu'à la réception du signal, il faut faire une pirouette au lieu d'une galipette.
-
+      La fonction ```signal()``` permet de modifier le comportement d'un signal, par exemple si on souhaite qu'à la réception du signal, il faut faire une pirouette au lieu d'une galipette. \
       Le prototype ```void ( *signal (int sig, void(*func)(int)) )(int)```, prend comme argument :
         - arg1: Le type de signal dont il faut modifier le comportement.
         - arg2: Le handler, qui est une fonction où l'on met dedans ce que l'on souhaite que le programme fasse à la réception du signal.
@@ -158,10 +152,8 @@ date: 21 septembre 2022
 
    2. **La fonction ```sigaction()``` et la structure ```struct sigaction```** :
 
-      La fonction ```sigaction()``` remplie le même objectif que la fonction ```signal()```, mais c'est une fonction *POSIX (Portable Operating System Interface)*.
-
-      La structure ```struct sigaction```, est un des arguments de la fonction ```sigaction()```, elle va permettre de modifier le comportement de notre signal. Par exemple pour le handler si on a
-      créé l'implémentation ```struct sigaction action``` on peut faire ```action.sa_handler = &sigHandler``` pour dire qu'à la réception du signal le programme doit faire la fonction ```sigHandler()```.
+      La fonction ```sigaction()``` remplie le même objectif que la fonction ```signal()```, mais c'est une fonction *POSIX (Portable Operating System Interface)*. \
+      La structure ```struct sigaction```, est un des arguments de la fonction ```sigaction()```, elle va permettre de modifier le comportement de notre signal. Par exemple pour le handler si on a créé l'implémentation ```struct sigaction action``` on peut faire ```action.sa_handler = &sigHandler``` pour dire qu'à la réception du signal le programme doit faire la fonction ```sigHandler()```.
 
       Le prototype ```int sigaction(int sig, const struct sigaction *__restrict__ new, struct sigaction *__restrict__ old);```, prend comme argument :
         - arg1: Le type de signal dont il faut modifier le comportement.
@@ -171,8 +163,7 @@ date: 21 septembre 2022
 
    4. **La fonction ```kill()```** :
 
-      Permet d'envoyer un signal.
-
+      Permet d'envoyer un signal. \
       Le prototype ```int kill(int pid, int sig)```, prend en argument un tableau de deux entiers. On peut utiliser les deux descripteurs fournis à la suite de l'appel de la fonction :
        - arg1: Le PID du processus qui doit recevoir le signal.
        - arg2: Le signal à émettre *(voir le tableau suivant).*
@@ -250,7 +241,124 @@ date: 21 septembre 2022
 # Le code du TP
 ```c
 /** nbOctets.c **/
+#include <stdio.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include "partage.h"
 
+/* Handler de signal pour SIGUSR1 */
+/* ============================== */
+void comHandler(int sig){
+    if (sig == SIGUSR1) printf("[%d] -- (PERE) -- Reception du signal SIGUSR1\n", getpid());
+}
+
+
+/* Le main */
+/* ======= */
+int main(int argc, const char * argv[]){
+    pid_t pidWC;
+    pid_t pidREAD;
+    
+    int statusWaitPidWC, statusPidWC;
+    int statusWaitPidREAD, statusPidREAD;
+
+    FILE *fIn;
+    char *fileName = NULL;
+    
+    struct sigaction action;
+    
+    if (argc!=2){
+        fprintf(stderr,"Usage: %s fileName\n",argv[0]);
+        return 1;
+    }
+    fileName = argv[1];
+    
+    
+    /* Gestion des signaux */
+    /* =================== */
+    action.sa_handler = &comHandler;
+    if (sigaction(SIGUSR1, &action, NULL) == -1){
+        perror("sigaction");
+        exit(EXIT_FAILURE);
+    }
+    else {
+        printf("[%d] -- (PERE) -- Communication handler set\n", getpid());
+    }
+
+
+    /* Creation de la zone de memoire partagee */
+    /* ======================================= */
+    Zone z;
+    if (creerZonePartagee(sizeof(int),&z)==-1) exit(-1);
+    int *ptDeb=(int*)z.debut;
+    
+    
+    /* Creation du tube */
+    /* ================ */
+    int tube[2];
+    pipe(tube);
+
+
+    /* Creation du processus qui fera le exec ... */
+    /* ============================================ */
+    pidWC=fork();
+        if(pidWC == 0){
+        printf("[%d] -- (FILS WC) -- Execution de la commande 'wc -c %s'\n", getpid(), fileName);
+        close(tube[0]); // fermeture en lecture (sortie du tube)
+        close(1); // pas d'écriture sur l'écran
+        dup(tube[1]); // la sortie standard devient l'entrée du tube
+        close(tube[1]); // descripteur inutile après redirection
+        execl("/usr/bin/wc", "wc", "-c", fileName, NULL);
+        exit(0);
+    }
+        else if(pidWC == -1){
+        printf("WC, ERROR: -1");
+        exit(-1);
+    }
+
+
+    /* Creation du processus qui fera la lecture ...*/
+    /* ============================================ */
+    pidREAD=fork();
+    if (pidREAD == 0){
+        close(tube[1]); // fermeture en écriture (entrée du tube)
+        close(0); // pas de lecture sur le clavier
+        fIn=fdopen(tube[0],"r"); // descripteur fIn est sur la sortie du tube (lecture)
+        printf("[%d] -- (FILS READ) -- Lecture à la sortie du tube\n", getpid());
+        fscanf(fIn, "%d", ptDeb); // on obtient la valeur en sortie du tube (retour de wc -c)
+        printf("[%d] -- (FILS READ) -- Ecriture du nombre de caractères de %s (%d) dans la mémoire partagé\n", getpid(), fileName, *ptDeb);
+        fclose(fIn);
+        printf("[%d] -- (FILS READ) -- Sleep 5sec avant d'envoyer le signal\n", getpid());
+        sleep(5);
+        printf("[%d] -- (FILS READ) -- Envoie du signal SIGUSR1\n", getpid());
+        kill(getppid(), SIGUSR1);
+        exit(0); // on termine le processus
+    }
+    else if(pidREAD == -1){
+        printf("READ, ERROR: -1");
+        exit(-1);
+    }
+
+
+    /* La suite du pere */
+    /* ================ */
+    sleep(1);
+    close(tube[1]); // fermeture en écriture (entrée du tube)
+    close(tube[0]); // fermeture en lecture (sortie du tube)
+    close(0); // pas de lecture sur le clavier
+    printf("[%d] -- (PERE) -- Attente du signal SIGUSR1\n", getpid());
+    pause();
+    printf("[%d] -- (PERE) -- Lecture dans la mémoire partagé: %d\n", getpid(), *ptDeb);
+    statusWaitPidWC = waitpid(pidWC, &statusPidWC, 0);
+    statusWaitPidREAD = waitpid(pidREAD, &statusPidREAD, 0);
+    supprimerZonePartagee(&z);
+    printf("\n[%d] -- (PERE) -- Fin du TP, status pidWC: %d, status pidWC: %d\n", getpid(), statusPidWC, statusPidREAD);
+    
+    return 0;
+}
 ```
 
 ```c
