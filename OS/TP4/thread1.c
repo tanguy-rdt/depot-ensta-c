@@ -20,7 +20,7 @@ void *thread_function(void *arg)
 {
     while (1) {
         fprintf(stderr, "New thread %d\n", (int)arg);
-        sleep(2);
+        sleep(1);
     }
 }
 
@@ -28,24 +28,28 @@ void *thread_function(void *arg)
 int main (void)
 {
     pthread_t thr;
+    size_t    multData[5];
+    size_t    i;
 
-    pthread_mutex_init(&verrou, NULL);
 
-    for(int i=1; i<=5; i++){
-        pthread_mutex_lock(&verrou);
-        if (pthread_create(&thr, NULL, thread_function, i) != 0) {
+    for(i=1; i<=5; i++){
+        multData[i] = i;
+    }
+
+
+    for(i=1; i<=5; i++){
+        if (pthread_create(&thr, NULL, thread_function, multData[i]) != 0) {
             fprintf(stderr, "Error during pthread_create()\n");
             exit(EXIT_FAILURE);
         }
 
         pthread_join(&thr, NULL);
-        pthread_mutex_unlock(&verrou);
     }
 
 
     while (1) {
         fprintf(stderr, "Main thread\n");
-        sleep(5);
+        sleep(2);
     }
     pthread_mutex_destroy(&verrou);
 }

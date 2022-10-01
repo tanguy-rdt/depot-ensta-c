@@ -78,14 +78,11 @@ void *mult(void * data)
     index = (size_t)data;
     fprintf(stderr,"Begin mult(%d)\n",index);
 
-    initPendingMult(&prod);
-
     for(iter=0;iter<prod.nbIterations;iter++)
     {
         //DONE: Attendre l'autorisation de multiplication POUR UNE NOUVELLE ITERATION...
         pthread_mutex_lock(&prod.mutex);
-        pthread_cond_wait(&prod.cond, &prod.mutex);
-        while(prod.state != STATE_MULT){};
+        while((prod.state != STATE_MULT) || (nbPendingMult(&prod) != prod.size)){pthread_cond_wait(&prod.cond, &prod.mutex);}
         pthread_mutex_unlock(&prod.mutex);
 
 
@@ -104,9 +101,9 @@ void *mult(void * data)
         prod.pendingMult[index] = 0;
         pthread_mutex_unlock(&prod.mutex);
 
-        //FIXME: Si c'est la derniere...
+        //DONE: Si c'est la derniere...
         if (nbPendingMult(&prod) == 0){
-            //FIXME: Autoriser le demarrage de l'addition...
+            //DONE: Autoriser le demarrage de l'addition...
             pthread_mutex_lock(&prod.mutex);
             prod.state = STATE_ADD;
             pthread_cond_broadcast(&prod.cond);
@@ -126,10 +123,9 @@ void * add(void * data)
     {
         size_t index;
 
-        //FIXME: Attendre l'autorisation d'addition...
+        //DONE: Attendre l'autorisation d'addition...
         pthread_mutex_lock(&prod.mutex);
-        pthread_cond_wait(&prod.cond, &prod.mutex);
-        while(prod.state != STATE_ADD){};
+        while(prod.state != STATE_ADD){pthread_cond_wait(&prod.cond, &prod.mutex);}
         pthread_mutex_unlock(&prod.mutex);
 
         fprintf(stderr,"--> add\n"); // L'addition peut commencer
@@ -145,7 +141,7 @@ void * add(void * data)
 
         fprintf(stderr,"<-- add\n");
 
-        //TODO: Autoriser le demarrage de l'affichage...
+        //DONE: Autoriser le demarrage de l'affichage...
         pthread_mutex_lock(&prod.mutex);
         prod.state = STATE_PRINT;
         pthread_cond_broadcast(&prod.cond);
@@ -230,27 +226,27 @@ int main(int argc,char ** argv)
         }
 
         //DONE: Autoriser le demarrage des multiplications pour une nouvelle iteration...
+        initPendingMult(&prod);
         pthread_mutex_lock(&prod.mutex);
         prod.state = STATE_MULT;
         pthread_cond_broadcast(&prod.cond);
         pthread_mutex_unlock(&prod.mutex);
 
-        //TODO: Attendre l'autorisation d'affichage...
+        //DONE: Attendre l'autorisation d'affichage...
         pthread_mutex_lock(&prod.mutex);
-        pthread_cond_wait(&prod.cond, &prod.mutex);
-        while(prod.state != STATE_PRINT){};
+        while(prod.state != STATE_PRINT){pthread_cond_wait(&prod.cond, &prod.mutex);}
         pthread_mutex_unlock(&prod.mutex);
 
         //DONE: Afficher le resultat de l'iteration courante...
-        fprintf(stderr,"ITERATION %d, RESULT=%.4g\n", iter, prod.result);
+        fprintf(stderr,"ITERATION %d, RESULT=%.4g\n\n", iter, prod.result);
     }
 
-//TODO: Attendre la fin des threads de multiplication...
+//DONE: Attendre la fin des threads de multiplication...
     for(i=0; i<prod.size; i++){
         pthread_join(*(multTh)+i, NULL);
     }
 
-//TODO: Attendre la fin du thread d'addition...
+//DONE: Attendre la fin du thread d'addition...
     pthread_join(addTh, NULL);
 
 //DONE: detruire prod.cond ...
