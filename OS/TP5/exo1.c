@@ -10,8 +10,8 @@ int main(int argc,char** argv){
 
     while(1){
         if(previousCPU != sched_getcpu()){
+            previousCPU = sched_getcpu();
             printf("%d\n", previousCPU);
         }
     }
-
 }

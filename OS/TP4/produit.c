@@ -243,7 +243,7 @@ int main(int argc,char ** argv)
 
 //DONE: Attendre la fin des threads de multiplication...
     for(i=0; i<prod.size; i++){
-        pthread_join(*(multTh)+i, NULL);
+        pthread_join(*(multTh+i), NULL);
     }
 
 //DONE: Attendre la fin du thread d'addition...
