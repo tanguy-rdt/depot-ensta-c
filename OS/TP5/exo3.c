@@ -1,7 +1,9 @@
 //
 // Created by Tanguy Roudaut on 29/09/2022.
 //
+#define _GNU_SOURCE
 
+#include <sched.h>
 #include <pthread.h>
 #include <sys/time.h>
 #include <stdio.h>
@@ -36,6 +38,70 @@ typedef struct
 Product prod;
 
 /*********** Function ***********/
+int getAffinityProcess(pid_t pid, cpu_set_t cpuSet){
+    char *state;
+
+    int nCPU = sysconf(_SC_NPROCESSORS_ONLN);
+    CPU_ZERO(&cpuSet);
+    if (sched_getaffinity(pid, sizeof(cpu_set_t), &cpuSet) == -1) {
+        perror("sched_getaffinity");
+        exit(-1);
+    }
+
+    printf("CPU affinity:\n");
+    for (int i = 0; i < nCPU; i++) {
+        if (CPU_ISSET(i, &cpuSet)) state = "true";
+        else state = "false";
+        printf("\t CPU %d: %s\n", i, state);
+    }
+
+    return 0;
+}
+
+int setAffinityProcess(pid_t pid, int numCPU, cpu_set_t cpuSet){
+    printf("Set affinity for the CPU %d\n", numCPU);
+    CPU_ZERO(&cpuSet);
+    CPU_SET(numCPU, &cpuSet);
+    if (sched_setaffinity(pid, sizeof(cpu_set_t), &cpuSet) == -1) {
+        perror("sched_setaffinity");
+        exit(-1);
+    }
+
+    return 0;
+}
+
+int getAffinityThread(pthread_t th, cpu_set_t cpuSet){
+    char *state;
+
+    int nCPU = sysconf(_SC_NPROCESSORS_ONLN);
+    CPU_ZERO(&cpuSet);
+    if (pthread_getaffinity_np(th, sizeof(cpu_set_t), &cpuSet) == -1) {
+        perror("sched_getaffinity");
+        exit(-1);
+    }
+
+    printf("CPU affinity:\n");
+    for (int i = 0; i < nCPU; i++) {
+        if (CPU_ISSET(i, &cpuSet)) state = "true";
+        else state = "false";
+        printf("\t CPU %d: %s\n", i, state);
+    }
+
+    return 0;
+}
+
+int setAffinityThread(pthread_t th, int numCPU, cpu_set_t cpuSet){
+    printf("Set affinity for the CPU %d\n", numCPU);
+    CPU_ZERO(&cpuSet);
+    CPU_SET(numCPU, &cpuSet);
+    if (pthread_setaffinity_np(th, sizeof(cpu_set_t), &cpuSet) == -1) {
+        perror("sched_setaffinity");
+        exit(-1);
+    }
+
+    return 0;
+}
+
 void initPendingMult(Product* prod)
 {
     size_t i;
@@ -85,7 +151,6 @@ void *mult(void * data)
         while((prod.state != STATE_MULT) || (nbPendingMult(&prod) != prod.size)){pthread_cond_wait(&prod.cond, &prod.mutex);}
         pthread_mutex_unlock(&prod.mutex);
 
-
         fprintf(stderr,"--> mult(%d)\n",index); // La multiplication peut commencer
 
         //DONE: Effectuer la multiplication a l'index du thread courant...
@@ -118,6 +183,7 @@ void * add(void * data)
 {
     size_t iter;
     fprintf(stderr,"Begin add()\n");
+
     /* Tant que toutes les iterations */
     for(iter=0;iter<prod.nbIterations;iter++)  // n'ont pas eu lieu
     {
@@ -173,6 +239,14 @@ int main(int argc,char ** argv)
         return(EXIT_FAILURE);
     }
 
+    cpu_set_t cpuSet;
+
+    printf("Gestion du CPU pour le processus appelant:\n", i);
+    getAffinityProcess(getpid(), cpuSet);
+    setAffinityProcess(getpid(), 0, cpuSet);
+    getAffinityProcess(getpid(), cpuSet);
+    printf("\n");
+
 /* Initialisations (Product, tableaux, generateur aleatoire,etc) */
     prod.state=STATE_WAIT;
     prod.pendingMult=(int *)malloc(prod.size*sizeof(int));
@@ -206,10 +280,24 @@ int main(int argc,char ** argv)
             fprintf(stderr, "Error during pthread_create()\n");
             exit(EXIT_FAILURE);
         }
+        printf("Gestion du CPU pour le thread de multiplication index %d:\n", i);
+        getAffinityThread(*(multTh+i), cpuSet);
+        setAffinityThread(*(multTh+i), i%2, cpuSet);
+        getAffinityThread(*(multTh+i), cpuSet);
+        printf("\n");
+
     }
 
 //DONE: Creer le thread d'addition...
-    pthread_create(&addTh, NULL, add, NULL);
+    if (pthread_create(&addTh, NULL, add, NULL) != 0){
+        fprintf(stderr, "Error during pthread_create()\n");
+        exit(EXIT_FAILURE);
+    }
+    printf("Gestion du CPU pour le thread d'addition :\n");
+    getAffinityThread(addTh, cpuSet);
+    setAffinityThread(addTh, 1, cpuSet);
+    getAffinityThread(addTh, cpuSet);
+    printf("\n");
 
     srand(time((time_t *)0));   // Init du generateur de nombres aleatoires
 
@@ -243,7 +331,7 @@ int main(int argc,char ** argv)
 
 //DONE: Attendre la fin des threads de multiplication...
     for(i=0; i<prod.size; i++){
-        pthread_join(*(multTh)+i, NULL);
+        pthread_join(*(multTh+i), NULL);
     }
 
 //DONE: Attendre la fin du thread d'addition...
