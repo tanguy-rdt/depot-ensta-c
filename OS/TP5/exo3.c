@@ -209,20 +209,20 @@ void *mult(void * data)
     size_t index;
     size_t iter;
 
-    //DONE: Recuperation de l'index, c'est a dire index = ...
+    //TODO: Recuperation de l'index, c'est a dire index = ...
     index = (size_t)data;
     fprintf(stderr,"Begin mult(%d)\n",index);
 
     for(iter=0;iter<prod.nbIterations;iter++)
     {
-        //DONE: Attendre l'autorisation de multiplication POUR UNE NOUVELLE ITERATION...
+        //TODO: Attendre l'autorisation de multiplication POUR UNE NOUVELLE ITERATION...
         pthread_mutex_lock(&prod.mutex);
         while((prod.state != STATE_MULT) || (nbPendingMult(&prod) != prod.size)){pthread_cond_wait(&prod.cond, &prod.mutex);}
         pthread_mutex_unlock(&prod.mutex);
 
         fprintf(stderr,"--> mult(%d)\n",index); // La multiplication peut commencer
 
-        //DONE: Effectuer la multiplication a l'index du thread courant...
+        //TODO: Effectuer la multiplication a l'index du thread courant...
         prod.v3[index] = prod.v1[index] * prod.v2[index];
 
         wasteTime(200+(rand()%200)); // Perte du temps avec wasteTime()
@@ -230,14 +230,14 @@ void *mult(void * data)
         fprintf(stderr,"<-- mult(%d) : %.3g*%.3g=%.3g\n", index,prod.v1[index],prod.v2[index],prod.v3[index]);//Affichage du calcul sur l'index
 
 
-        //DONE: Marquer la fin de la multiplication en cours...
+        //TODO: Marquer la fin de la multiplication en cours...
         pthread_mutex_lock(&prod.mutex);
         prod.pendingMult[index] = 0;
         pthread_mutex_unlock(&prod.mutex);
 
-        //DONE: Si c'est la derniere...
+        //TODO: Si c'est la derniere...
         if (nbPendingMult(&prod) == 0){
-            //DONE: Autoriser le demarrage de l'addition...
+            //TODO: Autoriser le demarrage de l'addition...
             pthread_mutex_lock(&prod.mutex);
             prod.state = STATE_ADD;
             pthread_cond_broadcast(&prod.cond);
@@ -263,7 +263,7 @@ void * add(void * data)
     {
         size_t index;
 
-        //DONE: Attendre l'autorisation d'addition...
+        //TODO: Attendre l'autorisation d'addition...
         pthread_mutex_lock(&prod.mutex);
         while(prod.state != STATE_ADD){pthread_cond_wait(&prod.cond, &prod.mutex);}
         pthread_mutex_unlock(&prod.mutex);
@@ -273,7 +273,7 @@ void * add(void * data)
         prod.result=0.0;
         for(index=0;index<prod.size;index++)
         {
-            //DONE: Effectuer l'addition...
+            //TODO: Effectuer l'addition...
             prod.result += prod.v3[index];
         }
 
@@ -281,7 +281,7 @@ void * add(void * data)
 
         fprintf(stderr,"<-- add\n");
 
-        //DONE: Autoriser le demarrage de l'affichage...
+        //TODO: Autoriser le demarrage de l'affichage...
         pthread_mutex_lock(&prod.mutex);
         prod.state = STATE_PRINT;
         pthread_cond_broadcast(&prod.cond);
@@ -300,10 +300,10 @@ int main(int argc,char ** argv)
     pthread_t  addTh;
     void      *threadReturnValue;
 
-/* A cause de warnings lorsque le code n'est pas encore la...*/
+    /* A cause de warnings lorsque le code n'est pas encore la...*/
     (void)addTh; (void)threadReturnValue;
 
-/* Lire le nombre d'iterations et la taille des vecteurs */
+    /* Lire le nombre d'iterations et la taille des vecteurs */
     if((argc<=2)||
        (sscanf(argv[1],"%u",&prod.nbIterations)!=1)||
        (sscanf(argv[2],"%u",&prod.size)!=1)||
@@ -316,34 +316,34 @@ int main(int argc,char ** argv)
     cpu_set_t cpuSet;
     int stateAffinityCPU;
 
-/* Initialisations (Product, tableaux, generateur aleatoire,etc) */
+    /* Initialisations (Product, tableaux, generateur aleatoire,etc) */
     prod.state=STATE_WAIT;
     prod.pendingMult=(int *)malloc(prod.size*sizeof(int));
 
-//DONE: initialiser prod.mutex...
+    //TODO: initialiser prod.mutex...
     pthread_mutex_init(&prod.mutex, NULL);
 
-//DONE: initialiser prod.cond...
+    //TODO: initialiser prod.cond...
     pthread_cond_init(&prod.cond, NULL);
 
-/* Allocation dynamique des 3 vecteurs v1, v2, v3 */
+    /* Allocation dynamique des 3 vecteurs v1, v2, v3 */
     prod.v1=(double *)malloc(prod.size*sizeof(double));
     prod.v2=(double *)malloc(prod.size*sizeof(double));
     prod.v3=(double *)malloc(prod.size*sizeof(double));
 
-/* Allocation dynamique du tableau pour les threads multiplieurs */
+    /* Allocation dynamique du tableau pour les threads multiplieurs */
     multTh=(pthread_t *)malloc(prod.size*sizeof(pthread_t));
 
-/* Allocation dynamique du tableau des MulData */
+    /* Allocation dynamique du tableau des MulData */
     multData=(size_t *)malloc(prod.size*sizeof(size_t));
 
-/* Initialisation du tableau des MulData */
+    /* Initialisation du tableau des MulData */
     for(i=0;i<prod.size;i++)
     {
         multData[i]=i;
     }
 
-//DONE: Gestion du CPU pour le processus appelant...
+    //TODO: Gestion du CPU pour le processus appelant...
     printf("---------------- Set up CPU Affinity -----------------\n\n");
     printf("Set up CPU affinity for the calling process:\n", i);
     getAffinityProcess(getpid(), cpuSet);
@@ -351,7 +351,7 @@ int main(int argc,char ** argv)
     getAffinityProcess(getpid(), cpuSet);
     printf("\n");
 
-//DONE: Creer les threads de multiplication...
+    //TODO: Creer les threads de multiplication...
     int nCPU = sysconf(_SC_NPROCESSORS_ONLN);
     for(i=0; i<prod.size; i++){
         if (pthread_create(multTh+i, NULL, mult, (size_t*)multData[i])  != 0) {
@@ -359,7 +359,7 @@ int main(int argc,char ** argv)
             exit(EXIT_FAILURE);
         }
 
-//DONE: Gestion du CPU pour le thread de multiplication...
+    //TODO: Gestion du CPU pour le thread de multiplication...
         printf("Set up CPU affinity for the multiplication thread, index %d:\n", i);
         getAffinityThread(*(multTh+i), cpuSet);
         stateAffinityCPU = setAffinityThread(*(multTh+i), i%nCPU, cpuSet);
@@ -368,13 +368,13 @@ int main(int argc,char ** argv)
 
     }
 
-//DONE: Creer le thread d'addition...
+    //TODO: Creer le thread d'addition...
     if (pthread_create(&addTh, NULL, add, NULL) != 0){
         fprintf(stderr, "Error during pthread_create()\n");
         exit(EXIT_FAILURE);
     }
 
-//DONE: Gestion du CPU pour le thread d'addition...
+    //TODO: Gestion du CPU pour le thread d'addition...
     printf("Set up CPU affinity for the addition thread:\n");
     getAffinityThread(addTh, cpuSet);
     stateAffinityCPU = setAffinityThread(addTh, 1, cpuSet);
@@ -407,34 +407,34 @@ int main(int argc,char ** argv)
             prod.v2[j]=10.0*(0.5-((double)rand())/((double)RAND_MAX));
         }
 
-        //DONE: Autoriser le demarrage des multiplications pour une nouvelle iteration...
+        //TODO: Autoriser le demarrage des multiplications pour une nouvelle iteration...
         initPendingMult(&prod);
         pthread_mutex_lock(&prod.mutex);
         prod.state = STATE_MULT;
         pthread_cond_broadcast(&prod.cond);
         pthread_mutex_unlock(&prod.mutex);
 
-        //DONE: Attendre l'autorisation d'affichage...
+        //TODO: Attendre l'autorisation d'affichage...
         pthread_mutex_lock(&prod.mutex);
         while(prod.state != STATE_PRINT){pthread_cond_wait(&prod.cond, &prod.mutex);}
         pthread_mutex_unlock(&prod.mutex);
 
-        //DONE: Afficher le resultat de l'iteration courante...
+        //TODO: Afficher le resultat de l'iteration courante...
         fprintf(stderr,"ITERATION %d, RESULT=%.4g\n\n", iter, prod.result);
     }
 
-//DONE: Attendre la fin des threads de multiplication...
+    //TODO: Attendre la fin des threads de multiplication...
     for(i=0; i<prod.size; i++){
         pthread_join(*(multTh+i), NULL);
     }
 
-//DONE: Attendre la fin du thread d'addition...
+    //TODO: Attendre la fin du thread d'addition...
     pthread_join(addTh, NULL);
 
-//DONE: detruire prod.cond ...
+    //TODO: detruire prod.cond ...
     pthread_cond_destroy(&prod.cond);
 
-//DONE: detruire prod.mutex...
+    //TODO: detruire prod.mutex...
     pthread_mutex_destroy(&prod.mutex);
 
 /* Detruire avec free ce qui a ete initialise avec malloc */
