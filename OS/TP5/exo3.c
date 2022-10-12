@@ -117,11 +117,9 @@ void *mult(void * data)
 
     //TODO: Recuperation de l'index, c'est a dire index = ...
     index = (size_t)data;
-    fprintf(stderr,"Begin mult(%d)\n",index);
-
     int nCPU = sysconf(_SC_NPROCESSORS_ONLN);
     setAffinityCPU(getpid(), index%nCPU, cpuSet);
-    int cpu = getAffinityCPU(getpid(), cpuSet);
+    fprintf(stderr,"Begin mult(%d) on cpu %d\n",index, getAffinityCPU(getpid(), cpuSet));
 
     for(iter=0;iter<prod.nbIterations;iter++)
     {
@@ -130,7 +128,7 @@ void *mult(void * data)
         while((prod.state != STATE_MULT) || (prod.pendingMult[index] == 0)){pthread_cond_wait(&prod.cond, &prod.mutex);}
         pthread_mutex_unlock(&prod.mutex);
 
-        fprintf(stderr,"--> mult(%d) on the cpu %d\n", index, cpu); // La multiplication peut commencer
+        fprintf(stderr,"--> mult(%d)\n", index); // La multiplication peut commencer
 
         //TODO: Effectuer la multiplication a l'index du thread courant...
         prod.v3[index] = prod.v1[index] * prod.v2[index];
@@ -165,12 +163,11 @@ void * add(void * data)
     while((prod.state != STATE_START) && (prod.state != STATE_MULT)){pthread_cond_wait(&prod.cond, &prod.mutex);}
     pthread_mutex_unlock(&prod.mutex);
 
-    size_t iter;
-    fprintf(stderr,"Begin add()\n");
-
     int nCPU = sysconf(_SC_NPROCESSORS_ONLN);
     setAffinityCPU(getpid(), 1, cpuSet);
-    int cpu = getAffinityCPU(getpid(), cpuSet);
+
+    size_t iter;
+    fprintf(stderr,"Begin add() on cpu %d\n", getAffinityCPU(getpid(), cpuSet));
 
     /* Tant que toutes les iterations */
     for(iter=0;iter<prod.nbIterations;iter++)  // n'ont pas eu lieu
@@ -182,7 +179,7 @@ void * add(void * data)
         while(prod.state != STATE_ADD){pthread_cond_wait(&prod.cond, &prod.mutex);}
         pthread_mutex_unlock(&prod.mutex);
 
-        fprintf(stderr,"--> add on the cpu %d\n", cpu); // L'addition peut commencer
+        fprintf(stderr,"--> add\n"); // L'addition peut commencer
 
         prod.result=0.0;
         for(index=0;index<prod.size;index++)
