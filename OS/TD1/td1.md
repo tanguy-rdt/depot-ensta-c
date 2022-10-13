@@ -1,7 +1,6 @@
 # TD1 - Les processus
 
 ## Exercice 1
-#
 
 ### Question 1:
 ```c

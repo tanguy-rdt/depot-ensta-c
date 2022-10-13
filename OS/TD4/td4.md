@@ -1,7 +1,6 @@
 # TD4 - Ordonnancement
 
 ## FCFS *(First come, first served)*
----
 ![](./img/FCFS.png)
   
 &darr;&rarr;| A | B | C | D | E | Moyenne
@@ -13,7 +12,6 @@
 
 
 ## RR (q=1) *(Round Robin)*
----
 ![](./img/RR1.png)
   
 &darr;&rarr;| A | B | C | D | E | Moyenne
@@ -25,7 +23,6 @@
 
 
  ## RR (q=4) *(Round Robin)*
----
 ![](./img/RR4.png)
   
 &darr;&rarr;| A | B | C | D | E | Moyenne
@@ -36,7 +33,6 @@
 
 
  ## SPN *(Shortest Process Next)*
----
 ![](./img/SPN.png)
   
 &darr;&rarr;| A | B | C | D | E | Moyenne
@@ -48,7 +44,6 @@
 
 
  ## SRT *(Shortest Remaining Time)*
----
 ![](./img/SRT.png)
   
 &darr;&rarr;| A | B | C | D | E | Moyenne
@@ -60,7 +55,6 @@
 
 
 ## HRRN *(Highest Response Ratio Next)*
----
 ![](./img/HRRN.png)
   
 &darr;&rarr;| A | B | C | D | E | Moyenne
@@ -74,7 +68,6 @@
 
 
 ## FB (q=1) *(Feedback)*
----
 ![](./img/FB.png)
   
 &darr;&rarr;| A | B | C | D | E | Moyenne

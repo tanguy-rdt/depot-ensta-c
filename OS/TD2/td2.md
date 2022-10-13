@@ -2,7 +2,6 @@
 
 
 ## Exercice 1:
----
 
 ```c
 rdv1, rdv2 = 0;
@@ -23,7 +22,6 @@ void P2(){
 ```
 
 ## Exercice 2:
----
 
 ```c
 rdv1, rdv2, rdv3 = 0;

@@ -1,7 +1,6 @@
 # TD3 - Communication inter-processus
 
 ## Exercice 1
----
 ```c
 void p1(){
     sleep(1);
@@ -19,7 +18,6 @@ void p2(){ // c'est ce processus qui gére le rdv le confirme
 ```
 
 ## Exercice 2
----
 ```c
 void pi(){
     int nbArrive = 0;
