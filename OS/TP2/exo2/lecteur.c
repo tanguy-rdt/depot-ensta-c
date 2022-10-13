@@ -11,7 +11,7 @@
 #include <unistd.h> 	   /*sleep*/
 
 #define PRJVAL  1
-#define MUTEX_R 0 // macro pour le processus redacteur
+#define MUTEX_FILE 0 // macro pour la lecture du fichier
 #define MUTEX_L 1 // macro pour le processus lecteur
 
 
@@ -114,7 +114,7 @@ int main (void)
     nb_lecteur = get_nb_lecteur(); // on récupère le nb de lecteur
     update_nb_lecteur(nb_lecteur+1); // on incrémente le nombre de lecteur
     if(get_nb_lecteur() == 1){
-        printf("%d", P(semid, MUTEX_R)); // si c'est le premier lecteur alors on prend le redacteur pour eviter une modif
+        printf("%d", P(semid, MUTEX_FILE)); // si c'est le premier lecteur alors on prend le redacteur pour eviter une modif
     }
     V(semid, MUTEX_L); // on libére le lecteur
 
@@ -125,7 +125,7 @@ int main (void)
     nb_lecteur = get_nb_lecteur(); // on récupère le nb de lecteur
     update_nb_lecteur(nb_lecteur-1); // on décrémente le nombre de lecteur
     if(get_nb_lecteur() == 0){
-        V(semid, MUTEX_R); // si c'est le dernier lecteur on libére le redacteur pour une modif potentiel
+        V(semid, MUTEX_FILE); // si c'est le dernier lecteur on libére le redacteur pour une modif potentiel
     }
     V(semid, MUTEX_L);  // on libére le lecteur
 

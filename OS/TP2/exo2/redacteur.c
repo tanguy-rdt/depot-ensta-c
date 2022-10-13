@@ -12,7 +12,7 @@
 #include <time.h>
 
 #define PRJVAL  1
-#define MUTEX_R 0 // macro pour le processus redacteur
+#define MUTEX_FILE 0 // macro pour la lecture du fichier
 #define MUTEX_L 1 // macro pour le processus lecteur
 
 time_t myTime;
@@ -79,10 +79,10 @@ int main (void)
     printf("cle %d (dec) %x (hex)\n", k, k);
     printf("semid obtenu:%d\n", semid);
 
-    P(semid, MUTEX_R); // On prend le rédacteur pour bloquer les lecteurs
+    P(semid, MUTEX_FILE); // On prend le rédacteur pour bloquer les lecteurs
     sleep(10); // sleep bidon
     ecrire(filename); // on écris dans le fichier
-    V(semid, MUTEX_R); // On libére le R pour permettre au L de lire le fichier
+    V(semid, MUTEX_FILE); // On libére le R pour permettre au L de lire le fichier
 
     //semctl(semid, 2, IPC_RMID); // suppression des sem
     return 0;
