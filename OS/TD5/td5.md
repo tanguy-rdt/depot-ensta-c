@@ -14,24 +14,30 @@
 
 **Swapin:**
   1. Pour un processus prêt:
+
     - Prêt, on ne sait pas combien de temps les bloqué le seront 
     - La priorité
     - La taille en fonction de la stratégie:
+
       - Efficacité: On garde les plus petits pour avoir le plus de processus possible dans la mémoire.
       - Sécurité: On garde le plus gros dans le cas où il n'y a plus de place quand on en a besoin.
+
     - Le *d-swap* pour faire de l'équité
   2. Pour un processus bloqué:
+
     - *d-swap* important (mis sur le disque depuis longtemps)
     - Priorité importante
     - Taille
 
 **Swapout:**
   1. Pour un processus prêt:
+
     - Bloqué
     - *d-swap* faible
     - Priorité faible
     - Taille
   2. Pour un processus bloqué:
+
     - Priorité faible
     - Taille
     - *d-swap* faible
@@ -154,7 +160,7 @@ n° page | 9 bits déplacement
 0100|000001010
 $4_{10}$|$10_{10}$
 
-![](./img/exo5.png)
+![](./img/exo6.png)
 
 ### Question 2 
 Adresse réel, table des pages &rarr;  $(1, 10) = 512+10 = 522$
@@ -166,7 +172,6 @@ $512+10 = 522$
 
 ## La segmentation 
 
-![](./img/seg.png)
 $(0, 28)$
 &darr;
 $540+128 = 666$
@@ -179,6 +184,4 @@ $(2, 465)$
 &darr;
 $54+$--465-- &rarr; **Erreur Segmentation**
 
-
-
-
+![](./img/seg.png)
