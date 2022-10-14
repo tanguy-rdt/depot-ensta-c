@@ -1,15 +1,8 @@
 # Systèmes d'exploitation
 
 ## Tables des matières
-- [Systèmes d'exploitation](#systèmes-dexploitation)
-  - [Tables des matières](#tables-des-matières)
   - [Introduction](#introduction)
   - [Concurence et Exclusion mutuelle](#concurence-et-exclusion-mutuelle)
-    - [**Exclusion mutuelle par attente active:**](#exclusion-mutuelle-par-attente-active)
-    - [**Exclusion mutuelle sans attente active:**](#exclusion-mutuelle-sans-attente-active)
-    - [Les primitives `sleep()` et `wakeup()`](#les-primitives-sleep-et-wakeup)
-    - [Les sémaphores](#les-sémaphores)
-    - [Les sémaphores sous UNIX](#les-sémaphores-sous-unix)
   - [Communication inter-processus](#communication-inter-processus)
   - [POSIX et threads](#posix-et-threads)
   - [Ordonnancement](#ordonnancement)
