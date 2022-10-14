@@ -15,32 +15,33 @@
 **Swapin:**
   1. Pour un processus prêt:
 
-    - Prêt, on ne sait pas combien de temps les bloqué le seront 
-    - La priorité
-    - La taille en fonction de la stratégie:
+     - Prêt, on ne sait pas combien de temps les bloqué le seront 
+     - La priorité
+     - La taille en fonction de la stratégie:
+       - Efficacité: On garde les plus petits pour avoir le plus de processus possible dans la mémoire.
+       - Sécurité: On garde le plus gros dans le cas où il n'y a plus de place quand on en a besoin.
+     - Le *d-swap* pour faire de l'équité
+  
 
-      - Efficacité: On garde les plus petits pour avoir le plus de processus possible dans la mémoire.
-      - Sécurité: On garde le plus gros dans le cas où il n'y a plus de place quand on en a besoin.
-
-    - Le *d-swap* pour faire de l'équité
   2. Pour un processus bloqué:
 
-    - *d-swap* important (mis sur le disque depuis longtemps)
-    - Priorité importante
-    - Taille
+     - *d-swap* important (mis sur le disque depuis longtemps)
+     - Priorité importante
+     - Taille
 
 **Swapout:**
+
   1. Pour un processus prêt:
+     - Bloqué
+     - *d-swap* faible
+     - Priorité faible
+     - Taille
+  
 
-    - Bloqué
-    - *d-swap* faible
-    - Priorité faible
-    - Taille
   2. Pour un processus bloqué:
-
-    - Priorité faible
-    - Taille
-    - *d-swap* faible
+     - Priorité faible
+     - Taille
+     - *d-swap* faible
 
 
 ## Exercice 3
@@ -137,13 +138,13 @@ int swapout(int index){
 ## Exercice 5
 
 ### Question 1
-16 pages &rarr; 512 octets 
+16 pages &rarr; 512 octets \
 4 bits *(num page)* &rarr; 9 bits *(num octets)*
 
 Soit un total de 13 bits
 
 ### Question 2
-Espqce d'addressage = 6 pages = 3ko
+Espqce d'addressage = 6 pages = 3ko \
 $6*512 = 3*1024$
 
 ### Question 3
@@ -157,8 +158,8 @@ $2048 = (?,?) = (4, 10) = 4*512+10$
 
 n° page | 9 bits déplacement 
 --- | ---
-0100|000001010
-$4_{10}$|$10_{10}$
+$0100_{(2)}$|$000001010_{(2)}$
+$4_{(10)}$|$10_{(10)}$
 
 ![](./img/exo6.png)
 
@@ -182,6 +183,6 @@ $1254+99 = 1353$
 
 $(2, 465)$
 &darr;
-$54+$--465-- &rarr; **Erreur Segmentation**
+$54+$ ~~465~~ &rarr; **Erreur Segmentation**
 
 ![](./img/seg.png)
