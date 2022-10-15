@@ -196,14 +196,26 @@ flowchart LR
 Ordonnancement à 3 niveaux :
 ```mermaid
 graph TD
-    A(Nouveau) -->B(Prêt)
-    B -->|choix d'un nouv. process.| C(Elu)
-    C --> E(Terminé)
+    subgraph "Ordo. mémoire"
+    A(Nouveau)
+    end
+    subgraph "Ordonnancement admission (long terme)"
+    F(Permuté bloqué)
+    G(Permuté prêt)
+    end
+    subgraph "Ordonnancement processeur (court terme)"
+    B(Prêt)
+    D(Bloqué)
+    C(Elu)
+    end
+    A-->B(Prêt)
+    B -->|choix d'un nouv. process.| C
+    C --> E
     C -->|stop process. courant| B
-    C -->|attente de données| D(Bloqué)
+    C -->|attente de données| D
     D -->|donnée dispo| B
-    D --> F(Permuté bloqué)
-    F --> G(Permuté prêt)
+    D --> F
+    F --> G
     B --> G
     G --> B
 ```
