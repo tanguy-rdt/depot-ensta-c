@@ -36,10 +36,10 @@ Pour résumé, les fonctions de base d'un système d'exploitation :
    - Les entrées-sorties
 
 
-## Concurence et Exclusion mutuelle
+## Concurence et Exclusion mutuelle - *cf [TP2](https://git.roudaut.xyz/ensta/depot-ensta-c/-/tree/SA3/OS/TP/TP2) & [TD2](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TD/TD2/td2.md)*
 
 L'exclusion mutuelle a pour but de **limiter l'accès** à une ressource pour un certain nombre de processus. \
-Par exemple le problème du lecteur/rédacteur *([cf TP2-exo2](https://git.roudaut.xyz/ensta/depot-ensta-c/-/tree/SA3/OS/TP/TP2/exo2))*, il est important que les processus lecteur n'ont pas accès au fichier pendant qu'un processus rédacteur l'utilise. \
+Par exemple le problème du lecteur/rédacteur, il est important que les processus lecteur n'ont pas accès au fichier pendant qu'un processus rédacteur l'utilise. \
 C'est ce qu'on appel une **section critique** où il y a un **accès concurrents**. \
 Il est important d'avoir un **mécanisme d'exclusion mutuelle** dans ce genre de cas, les ressources partagées au sein d'un OS ne peuvent être accédées qu'en exclusion mutuelle. 
 
@@ -104,11 +104,7 @@ Un **sémaphore général** peut avoir un très grand nombre d’états car il s
    valeur car il ne peut jamais devenir négatif.
 
 
-### Les sémaphores sous UNIX
-*[cf TP2](https://git.roudaut.xyz/ensta/depot-ensta-c/-/tree/SA3/OS/TP/TP2)*
-
-
-## Communication inter-processus
+## Communication inter-processus - *cf [TP3](https://git.roudaut.xyz/ensta/depot-ensta-c/-/tree/SA3/OS/TP/TP3) & [TD3](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TD/TD3/td3.md)*
 
 ### Les files de messages
 Les files de messages permettent aux processus de s'échanger des informations grâce aux opérations *send* et *recieve*. Les messages envoyés peuvent être de taille variable ou fixe, de manière directe ou indirecte *(en passent par une boite aux lettres)*, de manière synchrone ou asynchrone.
@@ -117,7 +113,6 @@ Les files de messages permettent aux processus de s'échanger des informations g
 Le principe est que les processus partagent des pages physiques par l'intermédiaire de leur espace d'adressage. L'avantage est que les informations ne sont pas en double *(contrairement aux files de messages)* comme l'information est partagée, mais dans ce cas c'est une **section critique**: Il faut utiliser un mécanisme d'exclusion mutuelle.
 
 Pour mettre en œuvre les segments de mémoires partagée sous *UNIX* il est important de créer le segment à l'exterieur de l'espace d'adressage des processus, soit par un autre processus. Par la suite, chaque processus voulant accéder au segment doit attacher le segment à son propre espace d'adressage. \
-*[cf TP3](https://git.roudaut.xyz/ensta/depot-ensta-c/-/tree/SA3/OS/TP/TP3) pour les primitives sous UNIX*
 
 ### Les tubes
 Un tube est un mécanismes de communication appartenant au système de gestion de fichiers. Leurs utilisations dans un processus ce fait par des descripteurs de fichier et à l'appel des primitives *read* et *write*.  
@@ -130,7 +125,6 @@ Métaphoriquement on peut réelement voir cela comme un tube :
 
 ![](./cours/img/tube.png)
 
-*[cf TP3](https://git.roudaut.xyz/ensta/depot-ensta-c/-/tree/SA3/OS/TP/TP3) pour les primitives sous UNIX*
 
 
 
@@ -156,14 +150,39 @@ Signal | N°  | Commentaires
 
 Le principe de fonctionnement est simple, on envoie le signal à un processus *(avec `kill()`)* et celui-ci fait l'action lié à ce signal. \
 Dans le cas où l'on veut modifier le comportement du processus à la reception du signal, c'est possible. Par exemple pour le signal `SIGKILL`, si on veut que le processus se détruise et qu'il affiche en plus *"je suis détruis"*. Il faut faire appel à la fonction signal pour reécrire le *handler* associé à ce signal. \
-*[cf TP3](https://git.roudaut.xyz/ensta/depot-ensta-c/-/tree/SA3/OS/TP/TP3) pour les primitives sous UNIX*
 
 
 
-## POSIX et threads
+## Threads et POSIX - *cf [TP4](https://git.roudaut.xyz/ensta/depot-ensta-c/-/tree/SA3/OS/TP/TP4)*
+
+### Les threads
+
+Le **multithreading** permet d'effectuer plusieurs tâches dans un seul processus, ce qui permet de gagner du temps puisque les tâches sont executé en parallèles :
+
+![](./cours/img/thread.jpeg)
 
 
-## Ordonnancement
+De plus, entre deux processus les informations ne sont pas partagés par défaut. Alors qu'avec deux threads au sein d'un même processus ils peuvent accéder aux même informations en veillant à utiliser un mécanisme d'exclusion mututelle à l'aide de fonction *POSIX*.
 
-## Gestion mémoire
+### POSIX
+POSIX pour *Portable Operating System Interface X(UNIX)* est une norme pour interfacer les applications avec les OS *(en gras les fonctions utilisées en TP)*:
+
+Groupe fonctionnel | Quelques fonctions principales
+--- | ----------------
+Multi-Threads | **pthread_create, pthread_exit, pthread_join**, pthread_detach, pthread_equal, pthread_self
+Ordonnancement de processus et de Threads | sched_setscheduler, sched_getscheduler, sched_setparam, sched_getparam, pthread_getschedparam, pthread_setschedprio, etc...
+Signaux temps réel | **sigqueue**, pthread_kill, **sigaction**, sigaltstack, sigemptyset, etc...
+Synchro. et comm. inter-processus | mq_open, mq_close, mq_receive, sem_init, sem_open, sem_wait, **pthread_mutex_init, pthread_mutex_destroy, pthread_cond_init**, shm_open, shm_unlink, mmap, etc...
+Données spécifiques aux threads | pthread_key_create, pthread_get_specific, etc...
+Gestion Mémoire | mlock, mlockall, munlock, munlockall, mprotect
+E/S Async | aio_read, aio_write, aio_error, aio_return, aio_fsync, etc...
+Horloges et minuteries (timers) | clock_gettime, clock_settime, clock_getres, times_create, timer_gettime, etc...
+Annulation | pthread_cancel, pthread_setcancelstate, pthread_cleanup_push, pthread_cleanup_pop
+
+Avec la norme POSIX il est possible de mettre en œuvre les différentes notions vus précédement: Les sémaphores, les mutex, les variabls de conditions, les signaux, les files de messages, la mémoire partagée, l'ordonnancement...
+
+## Ordonnancement - *cf [TP5](https://git.roudaut.xyz/ensta/depot-ensta-c/-/tree/SA3/OS/TP/TP5) & [TD4](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TD/TD4/td4.md)*
+
+
+## Gestion mémoire 
 
