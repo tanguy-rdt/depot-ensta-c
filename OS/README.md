@@ -2,11 +2,11 @@
 
 ## Tables des matières
   - [Introduction](#introduction)
-  - [Concurence et Exclusion mutuelle](#concurence-et-exclusion-mutuelle---cf-[TP2](https://git.roudaut.xyz/ensta/depot-ensta-c/-/tree/SA3/OS/TP/TP2)-&-[TD2](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TD/TD2/td2.md))
-  - [Communication inter-processus](#communication-inter-processus---cf-tp3--td3)
-  - [POSIX et threads](#threads-et-posix---cf-tp4)
-  - [Ordonnancement](#ordonnancement---cf-tp5--td4)
-  - [Gestion mémoire](#gestion-mémoire---td5)
+  - [Concurence et Exclusion mutuelle](##concurence-et-exclusion-mutuelle-cf-tp2-td2)
+  - [Communication inter-processus](#communication-inter-processus-cf-tp3-td3)
+  - [POSIX et threads](#threads-et-posix-cf-tp4)
+  - [Ordonnancement](#ordonnancement-cf-tp5-td4)
+  - [Gestion mémoire](#gestion-mémoire-td5)
 
 ## Introduction
 
@@ -25,7 +25,7 @@ Les OS permettent de répondre à deux besoins :
         Dans le cadre de la programmation, elle sera plus simple grâce à des *appels système* ou avec des commandes *Shell* dans un terminal.
    
 
-   1. En tant que ***gestionnaire de ressource*** :
+   2. En tant que ***gestionnaire de ressource*** :
         Dans ce cas l'OS permet d'ordonnancer et contrôller l'allocation des ressources entre les différent programmes. Les tâches les plus importante sont le partage des ressources et la protection de l'accès aux ressources
 
 Pour résumé, les fonctions de base d'un système d'exploitation :
