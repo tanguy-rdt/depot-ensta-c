@@ -110,6 +110,55 @@ Un **sémaphore général** peut avoir un très grand nombre d’états car il s
 
 ## Communication inter-processus
 
+### Les files de messages
+Les files de messages permettent aux processus de s'échanger des informations grâce aux opérations *send* et *recieve*. Les messages envoyés peuvent être de taille variable ou fixe, de manière directe ou indirecte *(en passent par une boite aux lettres)*, de manière synchrone ou asynchrone.
+
+### Les segments de mémoires partagée
+Le principe est que les processus partagent des pages physiques par l'intermédiaire de leur espace d'adressage. L'avantage est que les informations ne sont pas en double *(contrairement aux files de messages)* comme l'information est partagée, mais dans ce cas c'est une **section critique**: Il faut utiliser un mécanisme d'exclusion mutuelle.
+
+Pour mettre en œuvre les segments de mémoires partagée sous *UNIX* il est important de créer le segment à l'exterieur de l'espace d'adressage des processus, soit par un autre processus. Par la suite, chaque processus voulant accéder au segment doit attacher le segment à son propre espace d'adressage. \
+*[cf TP3](https://git.roudaut.xyz/ensta/depot-ensta-c/-/tree/SA3/OS/TP/TP3) pour les primitives sous UNIX*
+
+### Les tubes
+Un tube est un mécanismes de communication appartenant au système de gestion de fichiers. Leurs utilisations dans un processus ce fait par des descripteurs de fichier et à l'appel des primitives *read* et *write*.  
+
+Métaphoriquement on peut réelement voir cela comme un tube :
+- On à une entrée *(&rarr; 1)* et une sortie *(&rarr; 0)*.
+- Unidirectionnels comme il n'y a qu'une entrée/sortie
+- Si on stock pas l'information de sortie elle est perdu, l'information est sortie du tube.
+- La première information qui rentre est la première qui sort *(FIFO)*
+
+![](./cours/img/tube.png)
+
+*[cf TP3](https://git.roudaut.xyz/ensta/depot-ensta-c/-/tree/SA3/OS/TP/TP3) pour les primitives sous UNIX*
+
+
+
+### Les signaux
+
+Les signaux fonctionne en quelque sorte comme des interruptions, le *processus 1* peut envoyer un signal aux *processus 2* de finir sont travail. Mais ce signal n'est pas forcément reçus ou pris en compte et on ne peut pas non plus connaitre l'emetteur. \
+Il existe différent type de signaux et certains peuvent être fatal pour le processus courant :
+
+
+Signal | N°  | Commentaires 
+--- |---| ----------------------------------
+```SIGHUP```  | 1 | Signal émis lors d’une déconnexion
+```SIGINT```  | 2 | Il est émis à tout processus associé à un terminal de contrôle quand on appuie sur la touche d’interruption ‘Ctrl-C’.
+```SIGQUIT``` | 3 | Semblable à SIGINT mais le signal est émis quand on appuie sur la touche d’abandon (normalement ‘Ctl-\’).
+```SIGILL```  | 4 | Instruction illégale.
+```SIGFPE```  | 8 | Erreur de calcul flottant.
+```SIGKILL``` | 9 | C’est la seule manière absolument sûre de détruire un processus, puisque ce signal est toujours fatal.
+```SIGALRM``` | 14 | Signal émis par alarm(int sec) au bout de sec secondes.
+```SIGTERM``` | 15 | Terminaison logicielle. Il s’agit du signal standard de terminaison.
+```SIGUSR1``` | 16 | Premier signal à la disposition de l’utilisateur.
+```SIGUSR2``` | 17 | Deuxième signal à la disposition de l’utilisateur.
+```SIGCHLD``` | 18 | Ce signal est envoyé au père à la terminaison d’un processus fils.
+
+Le principe de fonctionnement est simple, on envoie le signal à un processus *(avec `kill()`)* et celui-ci fait l'action lié à ce signal. \
+Dans le cas où l'on veut modifier le comportement du processus à la reception du signal, c'est possible. Par exemple pour le signal `SIGKILL`, si on veut que le processus se détruise et qu'il affiche en plus *"je suis détruis"*. Il faut faire appel à la fonction signal pour reécrire le *handler* associé à ce signal. \
+*[cf TP3](https://git.roudaut.xyz/ensta/depot-ensta-c/-/tree/SA3/OS/TP/TP3) pour les primitives sous UNIX*
+
+
 
 ## POSIX et threads
 
