@@ -2,7 +2,7 @@
 
 ## Tables des matières
   - [Introduction](#introduction)
-  - [Concurence et Exclusion mutuelle](##concurence-et-exclusion-mutuelle-cf-tp2-td2)
+  - [Concurence et Exclusion mutuelle](#concurence-et-exclusion-mutuelle-cf-tp2-td2)
   - [Communication inter-processus](#communication-inter-processus-cf-tp3-td3)
   - [POSIX et threads](#threads-et-posix-cf-tp4)
   - [Ordonnancement](#ordonnancement-cf-tp5-td4)
@@ -183,6 +183,24 @@ Avec la norme POSIX il est possible de mettre en œuvre les différentes notions
 
 ## Ordonnancement - *cf [TP5](https://git.roudaut.xyz/ensta/depot-ensta-c/-/tree/SA3/OS/TP/TP5) & [TD4](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TD/TD4/td4.md)*
 
+Le rôle de l'ordonnanceur est de décider dans qu'elle état doivent se trouver les processus qui s’exécutent sur le CPU, il décide donc de l'ordre et de la durée d'éxecution. \
+Un bon ordonnanceur doit :
+ - Maximiser le temps d'utilisation du processeur à 100%
+ - Être équitable envers les autres processus (sinon problème de **famine**)
+ - Présenter un temps de réponse acceptable
+ - Avoir un bon rendement/débit
+ - Faire attention à la priorité des processus
+ - Minimiser le temps de réponse pour les utilisateurs en mode interactif et en batch
+flowchart LR
+
+Ordonnancement à 3 niveaux :
+```mermaid
+  graph TD;
+      A-->B;
+      A-->C;
+      B-->D;
+      C-->D;
+```
 
 ## Gestion mémoire - *[TD5](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TD/TD5/td5.md)*
 
