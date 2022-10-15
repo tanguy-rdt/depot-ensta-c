@@ -210,7 +210,7 @@ graph TD
     end
     A-->B(Prêt)
     B -->|choix d'un nouv. process.| C
-    C --> E
+    C --> E(Terminé)
     C -->|stop process. courant| B
     C -->|attente de données| D
     D -->|donnée dispo| B
