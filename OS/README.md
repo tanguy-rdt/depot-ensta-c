@@ -195,12 +195,40 @@ flowchart LR
 
 Ordonnancement à 3 niveaux :
 ```mermaid
-  graph TD;
-      A-->B;
-      A-->C;
-      B-->D;
-      C-->D;
+graph TD
+    A(Nouveau) -->B(Prêt)
+    B -->|choix d'un nouv. process.| C(Elu)
+    C --> E(Terminé)
+    C -->|stop process. courant| B
+    C -->|attente de données| D(Bloqué)
+    D -->|donnée dispo| B
+    D --> F(Permuté bloqué)
+    F --> G(Permuté prêt)
+    B --> G
+    G --> B
 ```
+
+![](./cours/img/ordonnanceur.png)
+
+
+Les ordonnanceurs doivent être adapté en fonction de l'utilisation :
+
+1. Ordonnancement Batch: \
+   Pas d'utilisateur devant l'écran donc non préemptifs, le changement de processus peut être réduit pour maximiser le nombre de job par heure, maximiser l'utilisation du CPU, minimiser le temps de rotation pour réduire la soumission et la complétion, chaque processus doit avoir accès au CPU de manière équitable.
+   
+   Exemple :
+   - FCFS *(First come, first served)*
+   - SPN *(Shortest Process Next)*
+   - HRRN *(Highest Response Ratio Next)*
+  
+
+2. Ordonnancement interactif: \
+   Il faut une réactivité importante pour pas que l'utilisateur et à attendre devant l'écran donc préemption, maximiser l'utilisation du CPU, chaque processus doit avoir accès au CPU de manière équitable.
+   
+   Exemple :
+   - RR *(Round Robin ou Tourniquet)*
+   - SRT *(Shortest Remaining Time)*
+   - FB *(FeedBack)*
 
 ## Gestion mémoire - *[TD5](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TD/TD5/td5.md)*
 
