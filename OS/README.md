@@ -123,7 +123,7 @@ Métaphoriquement on peut réelement voir cela comme un tube :
 - Si on stock pas l'information de sortie elle est perdu, l'information est sortie du tube.
 - La première information qui rentre est la première qui sort *(FIFO)*
 
-![](./cours/img/tube.png)
+![](./.cours/img/tube.png)
 
 
 
@@ -159,7 +159,7 @@ Dans le cas où l'on veut modifier le comportement du processus à la reception 
 
 Le **multithreading** permet d'effectuer plusieurs tâches dans un seul processus, ce qui permet de gagner du temps puisque les tâches sont executé en parallèles :
 
-![](./cours/img/thread.jpeg)
+![](./.cours/img/thread.jpeg)
 
 
 De plus, entre deux processus les informations ne sont pas partagés par défaut. Alors qu'avec deux threads au sein d'un même processus ils peuvent accéder aux même informations en veillant à utiliser un mécanisme d'exclusion mututelle à l'aide de fonction *POSIX*.
@@ -220,7 +220,7 @@ graph TD
     G --> B
 ```
 
-![](./cours/img/ordonnanceur.png)
+![](./.cours/img/ordonnanceur.png)
 
 
 Les ordonnanceurs doivent être adapté en fonction de l'utilisation :
@@ -243,4 +243,44 @@ Les ordonnanceurs doivent être adapté en fonction de l'utilisation :
    - FB *(FeedBack)*
 
 ## Gestion mémoire - *[TD5](https://git.roudaut.xyz/ensta/depot-ensta-c/-/blob/SA3/OS/TD/TD5/td5.md)*
+**La mémoire principale** est le lieu où se trouvent les programmes et les données
+quand le processeur les exécute. \
+**La mémoire secondaire**, représentée par les disques, de
+plus grande capacité, où les programmes peuvent séjourner avant d’être exécutés.\
+Il faut donc transférer les processus que l'on veut utilisé de la mémoire secondaire vers la mémoire principale, mais pour ça il faut de la place. Des transferts de processus dans les deux sens sont nécessaire. 
 
+Pour assurer une protection, la plupart des processeurs disposent de deux registres
+délimitant le domaine d’un processus:
+1. Le registre de base contient l’adresse de base du processus en mémoire.
+2. Le registre barrière (limite) contient une adresse limite.
+
+```mermaid
+graph LR
+    id1[(UC)] -->A("@physique<@barrière")-->|oui| C[Mémoire]
+    B("@logique(100) + @base") --> A 
+    A -->|non| D(Interruption)
+```
+
+### L'allocation
+
+Pour mettre en œuvre l'allocation il est nécessaire:
+1. **de connaître sont état**, c'est à dire les zones libre ou occupées. La mémoire est découpée en blocs, on peut garder la trace de si ils sont occupés ou non par l'intermédiaire d'une table de bits *(bitmap)* ou une liste chainée.
+2. **d'avoir une stratégie d'allocation**:
+   - Le *premier ajustement (first fit)* consiste à allouer le premier bloc de la liste qui peut contenir le processus,
+   - Le *meilleur ajustement (best fit)* consiste à allouer le plus petit bloc de la liste qui peut contenir le processus.
+   - Le *pire ajustement (worst fit)* consiste à allouer le plus grand bloc de la liste et de le fragmenter en deux.
+3. **d'avoir une procédures de libération**, pour marquer le bloc qui vient d'être libéré et de potentiellement le fusionner avec les blocs adjacents libres.
+
+### Le swap
+Le swap est mis en œuvre lorsque tous les processus ne peuvent pas tenir simultanément en mémoire. On doit alors en déplacer temporairement certains sur disque dans une zone de swap.
+
+![](./.cours/img/swap.png)
+
+Le swap permet de pallier le manque de mémoire nécessaire à plusieurs utilisateurs/processus, mais 
+Il n’autorise pas l’exécution de programmes de taille supérieure à celle de la mémoire centrale.
+
+### La pagination
+
+### La mémoire virtuelle
+
+### La segmentation
