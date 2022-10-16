@@ -145,7 +145,7 @@ Soit un total de 13 bits
 
 ### Question 2
 Espqce d'addressage = 6 pages = 3ko \
-6*512 = 3*1024
+6x512 = 3x1024
 
 ### Question 3
 4 pages présente en mémoire &rarr; 2ko
