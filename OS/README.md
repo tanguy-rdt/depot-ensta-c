@@ -112,7 +112,7 @@ Les files de messages permettent aux processus de s'échanger des informations g
 ### Les segments de mémoires partagée
 Le principe est que les processus partagent des pages physiques par l'intermédiaire de leur espace d'adressage. L'avantage est que les informations ne sont pas en double *(contrairement aux files de messages)* comme l'information est partagée, mais dans ce cas c'est une **section critique**: Il faut utiliser un mécanisme d'exclusion mutuelle.
 
-Pour mettre en œuvre les segments de mémoires partagée sous *UNIX* il est important de créer le segment à l'exterieur de l'espace d'adressage des processus, soit par un autre processus. Par la suite, chaque processus voulant accéder au segment doit attacher le segment à son propre espace d'adressage. \
+Pour mettre en œuvre les segments de mémoires partagée sous *UNIX* il est important de créer le segment à l'exterieur de l'espace d'adressage des processus, soit par un autre processus. Par la suite, chaque processus voulant accéder au segment doit attacher le segment à son propre espace d'adressage. 
 
 ### Les tubes
 Un tube est un mécanismes de communication appartenant au système de gestion de fichiers. Leurs utilisations dans un processus ce fait par des descripteurs de fichier et à l'appel des primitives *read* et *write*.  
@@ -281,6 +281,61 @@ Il n’autorise pas l’exécution de programmes de taille supérieure à celle 
 
 ### La pagination
 
+La pagination permet d'accélélerer les mécanismes d'allocation de mémoire. 
+
+La mémoire est découpé en différentes page de taille fixe de généralement 4Ko, l'espace d'adressage du processus est également découpé en page. Pour entrer un processus en mémoire, ses différentes pages sont placé sur des pages libres de la mémoires :
+
+- **Le fonctionnement de la pagination**
+
+   ![](./.cours/img/pagination.png)
+
+   Pour retrouver la page physique correspondante à la page logique que l'on souhaite on utilise une **table des pages** :
+
+   Num page logique | Num page physique
+   ---|---
+   0|14
+   1|4
+   2|8
+   3|12
+
+
+   Pour retrouver la page physique à partir de la page logique : \
+   numPage = @logique/taillePage \
+   position = @logique%taillePage
+
+Grâce à ce système on est plus obligé de compacter la mémoire, puisque chaque page est remplie par une des pages du processus. On à donc plus vraiment besoin de s'inquieter de la taille du processus pour l'ordonnancement.
+De plus, quand un processus contient le même code qu'un autre, il est placé dans un page partagée et protégées en écriture, ce qui facilite le partage et l'exclusion mutuelle.
+
+
 ### La mémoire virtuelle
+
+Certains prorgamme on une taille suffisament importante pour ne pas pouvoir être placer en mémoire tout en cohabitant avec d'autres programmes. \
+C'est le cas de la primitive `ls`, si on fait un `man ls`, on se rend compte qu'un grand nombre d'option existe. Mais une grande partis du temps on l'utilise sans options, il est donc pas très judicieux d'avoir toutes ses fonctionnalités en mémoire. 
+
+C'est dans ce cadre que rentre la mémoire virtuelle, cette mémoire est virtualisé sur la mémoire réel(je ne vois pas l'intérêt pour le coup) et/ou la mémoire physique. Cette mémoire virtuelle est beaucoup plus grande que la mémoire réel, ce qui permet de répondre à notre problème et de pouvoir exécuter certains programmes lourd : *(On remarque qu'on utilise la pagination)*
+
+![](./.cours/img/memVirtual.png)
+
+
+Les adresses manipulées par les programmes sont appelées des adresses virtuelles et
+constituent l’espace d’adressage virtuel. L’espace d’adressage virtuel est divisé en petites unités appelées pages et les unités correspondantes de la mémoire physique sont les cadres mémoire (ou cases
+mémoire ou *frame*). Les pages et les cadres sont toujours de la même taille, les transferts entre la mémoire et le disque se font toujours par pages entières (au moins).
+
+Lorsque la mémoire virtuelle est utilisé, les adresses virtuelles ne sont pas directement placées sur le bus de mémoire, elles sont envoyées à l’unité de gestion de la mémoire ou MMU *(Memory
+Management Unit)*, c'est composant qui traduit les adresses virtuelles en adresses
+physiques:
+
+![](./.cours/img/mmu.png)
+
+ - L'adresse virtuelle est transcodée grâce à une table des pages et à des circuits matériels de gestion : Memory Management Unit (MMU).
+   -  Si cette adresse correspond à une adresse en mémoire physique, le MMU transmet
+      sur le bus l’adresse réelle.
+   - Sinon il se produit un défaut de page. Lorsqu’un défaut de page se produit, il faut charger la page virtuelle correspondante en mémoire réelle. On choisit parmi les pages réelles une page “victime ”, si cette dernière a été modifiée on la reporte en mémoire virtuelle (sur le disque), 
+   et on charge à sa place la page à laquelle on désirait accéder
+
+
+
+
+
 
 ### La segmentation
