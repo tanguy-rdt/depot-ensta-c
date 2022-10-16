@@ -145,7 +145,7 @@ Soit un total de 13 bits
 
 ### Question 2
 Espqce d'addressage = 6 pages = 3ko \
-$6*512 = 3*1024$
+6*512 = 3*1024
 
 ### Question 3
 4 pages présente en mémoire &rarr; 2ko
@@ -154,17 +154,17 @@ $6*512 = 3*1024$
 ## Exercice 6
 
 ### Question 1
-$2048 = (?,?) = (4, 10) = 4*512+10$
+2048 = (?,?) = (4, 10) = 4*512+10
 
 n° page | 9 bits déplacement 
 --- | ---
-$0100_{(2)}$|$000001010_{(2)}$
-$4_{(10)}$|$10_{(10)}$
+0100|$000001010
+4 en base (10)|10 en base (10)
 
 ![](./img/exo6.png)
 
 ### Question 2 
-Adresse réel, table des pages &rarr;  $(1, 10) = 512+10 = 522$
+Adresse réel, table des pages &rarr;  (1, 10) = 512+10 = 522
 
 
 ### Question 3
@@ -173,16 +173,18 @@ $512+10 = 522$
 
 ## La segmentation 
 
-$(0, 28)$
-&darr;
-$540+128 = 666$
+(0, 28) \
+&darr; \
+540+128 = 666
 
-$(1, 95)$
-&darr;
-$1254+99 = 1353$
 
-$(2, 465)$
-&darr;
-$54+$ ~~465~~ &rarr; **Erreur Segmentation**
+(1, 95) \
+&darr; \
+1254+99 = 1353
+
+
+(2, 465) \
+&darr; \
+54+ ~~465~~ &rarr; **Erreur Segmentation**
 
 ![](./img/seg.png)
