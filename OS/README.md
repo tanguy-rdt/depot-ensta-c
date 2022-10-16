@@ -304,7 +304,9 @@ La mémoire est découpé en différentes page de taille fixe de généralement 
    position = @logique%taillePage
 
 Grâce à ce système on est plus obligé de compacter la mémoire, puisque chaque page est remplie par une des pages du processus. On à donc plus vraiment besoin de s'inquieter de la taille du processus pour l'ordonnancement.
-De plus, quand un processus contient le même code qu'un autre, il est placé dans un page partagée et protégées en écriture, ce qui facilite le partage et l'exclusion mutuelle.
+De plus, quand un processus contient le même code qu'un autre, il est placé dans un page partagée et protégées en écriture, ce qui facilite le partage et l'exclusion mutuelle.\
+
+La pagination évite la fragmentation externe mais il faut faire attention à la fragmentation interne.
 
 
 ### La mémoire virtuelle
@@ -335,7 +337,38 @@ physiques:
 
 
 
-
-
-
 ### La segmentation
+
+Dans un espace mémoire à une dimension, il faut attribuer à chacune de ces 5 tables un espace contigu :
+
+![](./.cours/img/seg1.png)
+
+- On remarque que ce programme comporte un grand nombre de variable, la table des symboles chevauche la table du code
+- Ce qui pose problème puisque le programme ne pourra pas être compilé, avec comme erreur un manque de place, mais c'est faux les autres tables on de l'espace libre.
+
+
+La solution consiste à disposer de plusieurs espaces d’adresses
+indépendants appelés segments **(ou régions)**.
+Chaque segment est une suite d’adresses contiguës de 0 à une adresse maximale. La taille d’un segment varie en cours d’exécution. La taille d’un segment de pile
+peut augmenter lorsque quelque chose est empilé et diminuer lorsque quelque
+chose est dépilé :
+
+
+![](./.cours/img/seg2.png)
+
+Pour spécifier une adresse dans un espace mémoire à segmentation, le
+programme doit fournir une adresse en 2 parties :
+ - Un numéro de segment
+ - Une adresse au sein du segment
+
+Ce qui donne en mémoire :
+
+![](./.cours/img/seg.png)
+
+
+### Conclusion 
+ - Concurrence + facilité de développement &rarr; techniques de gestion de la mémoire
+ - **Swap:** plus grand nombre d’espaces d’adressage (processus) chargés
+ - **Pagination:** éviter la fragmentation externe
+ - **Mémoire virtuelle:** charger des parties d’espace d’adressage seulement
+ - **Segmentation:** différencier fonctionnellement les régions de l’espace d’adressage
