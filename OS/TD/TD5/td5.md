@@ -124,7 +124,7 @@ int swapout(int index){
     return -1;
   }
 
-  if(libererZone(processus[index].pt_disque, processus[index].pt_mem) != 0){
+  if(libererZone(processus[index].taille, processus[index].pt_mem) != 0){
     return -2;
   }
 
