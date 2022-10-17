@@ -62,8 +62,8 @@
  **Temps de terminaison** | 3 | 9 | 13 | 20 | 15 | 
  **Temps de rotation (Tterm-Tarrivé)**| 3 | 7 | 9 | 14 | 7 | 8
  **Tr/Ts** | 1 | 1,16 | 2,25 | 2,8 | 3,5 | 2,142
- **R1 (Tatt+Tservice)/(Tatt)**|   |   | 2,25 | 1,6 | 1,5 |
- **R2 (Tatt+Tservice)/(Tatt)**|   |   |      | 2,4 | 3,5
+ **R1 (Tatt+Tservice)/(Tservice)**|   |   | 2,25 | 1,6 | 1,5 |
+ **R2 (Tatt+Tservice)/(Tservice)**|   |   |      | 2,4 | 3,5
 
 
 
