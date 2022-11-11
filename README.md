@@ -6,3 +6,4 @@ You must select a branch to move from one academic sequence to another :
   - [Introduction to C language](https://github.com/tanguy-rdt/depot-ensta-c/tree/SA2)
 - SA3:
   - [Operating System](https://github.com/tanguy-rdt/depot-ensta-c/tree/SA3/OS)
+- [Wiki](https://github.com/tanguy-rdt/depot-ensta-c/wiki)
